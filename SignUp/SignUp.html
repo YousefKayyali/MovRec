@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="SignUp.css"> <!-- Link to external CSS file -->
+  </head>
+  <body>
+    <div class="signup-container">
+      <div class="signup-title">Sign Up</div>
+      <form id="signUpForm">
+        <input
+          type="text"
+          class="input-field"
+          name="username"
+          placeholder="Username"
+          required
+        />
+        <input
+          type="email"
+          class="input-field"
+          name="email"
+          placeholder="Email Address"
+          required
+        />
+        <input
+          type="password"
+          class="input-field"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <input
+          type="password"
+          class="input-field"
+          name="confirm_password"
+          placeholder="Confirm Password"
+          required
+        />
+        <button type="submit" class="button-3">Sign Up</button>
+      </form>
+      <div class="footer-text">
+        Already have an account? <a href="login.html">Sign In</a>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('signUpForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Here, you can perform any additional validation or processing before redirecting
+
+        // After form submission, redirect to categories.html
+        window.location.href = 'categories.html';
+      });
+    </script>
+  </body>
+</html>
