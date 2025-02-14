@@ -1,0 +1,237 @@
+/* General Styles */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    line-height: 1.6;
+}
+
+/* Header Section */
+.header {
+    text-align: center;
+    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+                var(--backdrop-url) center/cover no-repeat;
+    padding: 80px 20px;
+    border-bottom: 2px solid #ff0000;
+    position: relative;
+    overflow: hidden;
+}
+
+.header h1 {
+    font-size: 4rem;
+    margin: 0;
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-transform: uppercase;
+    animation: fadeInDown 1s ease-in-out;
+}
+
+.header h2 {
+    font-size: 2rem;
+    font-weight: 300;
+    margin-top: 15px;
+    color: #ffdd57;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.header img {
+    margin-top: 40px;
+    border-radius: 20px;
+    width: 320px;
+    height: auto;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+.header img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.9);
+}
+
+/* Content Section */
+.content {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 40px;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.left, .right {
+    flex: 1;
+    min-width: 300px;
+    background: #1e1e1e;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.left:hover, .right:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+}
+
+.left h3, .right h3 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #ffdd57;
+    border-bottom: 2px solid #ff0000;
+    padding-bottom: 10px;
+}
+
+.left p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #cccccc;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.tags span {
+    background: #ff0000;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.tags span:hover {
+    background: #e00000;
+}
+
+.right ul {
+    list-style: none;
+    padding: 0;
+}
+
+.right ul li {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #cccccc;
+    padding-left: 20px;
+    position: relative;
+}
+
+.right ul li::before {
+    content: "•";
+    color: #ff0000;
+    font-size: 1.5rem;
+    position: absolute;
+    left: 0;
+    top: -2px;
+}
+
+/* Footer Section */
+.footer {
+    text-align: center;
+    padding: 40px;
+    background: #181818;
+    border-top: 2px solid #ff0000;
+    margin-top: 40px;
+}
+
+.footer button {
+    background: #ff0000;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.footer button:hover {
+    background: #e00000;
+    transform: translateY(-5px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2.5rem;
+    }
+
+    .header h2 {
+        font-size: 1.5rem;
+    }
+
+    .header img {
+        width: 250px;
+    }
+
+    .content {
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .left, .right {
+        padding: 20px;
+    }
+
+    .left h3, .right h3 {
+        font-size: 1.5rem;
+    }
+
+    .left p {
+        font-size: 1rem;
+    }
+
+    .tags span {
+        font-size: 0.8rem;
+    }
+
+    .right ul li {
+        font-size: 1rem;
+    }
+
+    .footer button {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}
