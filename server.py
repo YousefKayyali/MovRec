@@ -89,12 +89,14 @@ def get_movies():
     page = int(request.args.get("page", 1))
     per_page = int(request.args.get("per_page", 100))
     sort_by = request.args.get("sort_by", "rating")
-    genre = request.args.get("genre", None)
+    genres = request.args.getlist("genre")  # Get list of genres
 
-    # Filter movies by genre if provided
-    if genre:
-        # Get movie IDs that belong to the selected genre
-        genre_movie_ids = genres_df[genres_df["genre"] == genre]["movie_id"].tolist()
+    # Filter movies by genres if provided
+    if genres:
+        # Get movie IDs that belong to all selected genres
+        genre_movie_ids = set(genres_df[genres_df["genre"].isin(genres)]["movie_id"].tolist())
+        for genre in genres:
+            genre_movie_ids.intersection_update(set(genres_df[genres_df["genre"] == genre]["movie_id"].tolist()))
         filtered_movies = movies_df[movies_df["Movie ID"].isin(genre_movie_ids)]
     else:
         filtered_movies = movies_df

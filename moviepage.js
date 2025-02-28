@@ -37,13 +37,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Update genres
             const genresContainer = document.querySelector(".tags");
-            genresContainer.innerHTML = movie.genres.map(genre => `<span class="genre">${genre}</span>`).join("");
+            genresContainer.innerHTML = movie.genres
+                .map(genre => `<span class="genre" data-genre="${genre}">${genre}</span>`)
+                .join("");
 
             // Add event listeners to genre elements
             const genreElements = document.querySelectorAll(".genre");
             genreElements.forEach(genreElement => {
                 genreElement.addEventListener("click", () => {
-                    const genre = genreElement.textContent;
+                    const genre = genreElement.getAttribute("data-genre");
                     window.location.href = `homepage.html?genre=${encodeURIComponent(genre)}`;
                 });
             });

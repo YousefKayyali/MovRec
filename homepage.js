@@ -3,18 +3,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     const genreDropdown = document.getElementById("genre-dropdown");
     const searchInput = document.getElementById("search-input");
     const autocompleteResults = document.getElementById("autocomplete-results");
-    const logo = document.getElementById("logo"); // Get the logo element
+    const logo = document.getElementById("logo");
 
     let currentPage = 1;
     let isLoading = false;
     let allMovies = [];
-    let selectedGenre = null;
+    let selectedGenres = new Set();
 
-    // Get the genre from the URL query parameter
+    // Check for genre query parameter in the URL
     const urlParams = new URLSearchParams(window.location.search);
     const genreFromURL = urlParams.get("genre");
+
     if (genreFromURL) {
-        selectedGenre = genreFromURL;
+        selectedGenres.add(genreFromURL);
     }
 
     // Redirect to homepage without query parameters when logo is clicked
@@ -23,12 +24,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Fetch movies sorted by average rating
-    async function fetchMovies(page = 1, genre = null) {
+    async function fetchMovies(page = 1) {
         try {
             isLoading = true;
             let url = `http://localhost:8000/movies?page=${page}&sort_by=rating&per_page=100`;
-            if (genre) {
-                url += `&genre=${genre}`;
+            if (selectedGenres.size > 0) {
+                selectedGenres.forEach(genre => {
+                    url += `&genre=${genre}`;
+                });
             }
             const response = await fetch(url);
             if (!response.ok) {
@@ -54,7 +57,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const movieElement = document.createElement("div");
             movieElement.classList.add("movie");
 
-            // Ensure correct poster and backdrop paths
             let posterPath = movie.image_id ? `http://localhost:8000/images/posters/${movie.image_id}` : "http://localhost:8000/images/posters/default.jpg";
             let backdropPath = movie.image_id ? `http://localhost:8000/images/backdrops/${movie.image_id}` : "http://localhost:8000/images/backdrops/default.jpg";
 
@@ -82,7 +84,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Load initial movies
     async function loadInitialMovies() {
-        const movies = await fetchMovies(currentPage, selectedGenre);
+        const movies = await fetchMovies(currentPage);
         renderMovies(movies);
     }
 
@@ -90,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function loadMoreMovies() {
         if (isLoading) return;
         currentPage++;
-        const movies = await fetchMovies(currentPage, selectedGenre);
+        const movies = await fetchMovies(currentPage);
         renderMovies(movies);
     }
 
@@ -125,8 +127,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const genreItem = document.createElement("div");
                 genreItem.classList.add("dropdown-item");
                 genreItem.textContent = genre;
+                if (selectedGenres.has(genre)) {
+                    genreItem.classList.add("selected");
+                }
                 genreItem.addEventListener("click", () => {
-                    selectedGenre = genre;
+                    if (selectedGenres.has(genre)) {
+                        selectedGenres.delete(genre);
+                        genreItem.classList.remove("selected");
+                    } else {
+                        selectedGenres.add(genre);
+                        genreItem.classList.add("selected");
+                    }
                     allMovies = [];
                     movieContainer.innerHTML = "";
                     currentPage = 1;
@@ -161,9 +172,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     function showAutocompleteResults(results) {
-        autocompleteResults.innerHTML = ""; // Clear previous results
+        autocompleteResults.innerHTML = "";
 
-        // Use a Set to filter out duplicates based on movie ID
         const uniqueResults = Array.from(new Set(results.map(movie => movie["Movie ID"])))
             .map(id => results.find(movie => movie["Movie ID"] === id));
 

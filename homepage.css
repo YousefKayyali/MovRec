@@ -143,6 +143,11 @@ header {
 .dropdown .dropdown-item:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
+/* Add the CSS for selected genre items */
+.dropdown-item.selected {
+    background-color: rgba(255, 0, 0, 0.8);
+    color: white;
+}
 
 /* Authentication buttons */
 .header-auth {
@@ -376,4 +381,5 @@ header {
     .movie img {
         height: 180px;
     }
+    
 }
