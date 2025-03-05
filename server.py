@@ -149,6 +149,43 @@ def get_movie_details(movie_id):
     print("Movie Data:", movie_data)
     return jsonify(movie_data)
 
+@app.route("/similar-movies/<movie_id>", methods=["GET"])
+def get_similar_movies(movie_id):
+    if "Movie ID" not in movies_df.columns:
+        return jsonify({"error": "Movie data not available"}), 500
+
+    movie = movies_df[movies_df["Movie ID"] == movie_id]
+    if movie.empty:
+        return jsonify({"error": "Movie not found"}), 404
+
+    movie_data = movie.iloc[0].to_dict()
+    director = movie_data.get("Director")
+    cast = movie_data.get("Cast", "").split(",") if movie_data.get("Cast") else []
+    genres = movie_data.get("genres", [])
+
+    # Find movies with the same director or at least one common star
+    similar_movies = movies_df[
+        (movies_df["Director"] == director) | 
+        (movies_df["Cast"].apply(lambda x: any(star in x for star in cast) if x else False))
+    ]
+
+    # Add movies with similar genres
+    genre_movies = movies_df[movies_df["Movie ID"].isin(genres_df[genres_df["genre"].isin(genres)]["movie_id"].unique())]
+
+    # Combine both sets of movies
+    similar_movies = pd.concat([similar_movies, genre_movies]).drop_duplicates(subset=["Movie ID"])
+
+    # Exclude the current movie
+    similar_movies = similar_movies[similar_movies["Movie ID"] != movie_id]
+
+    # Sort by rating (popularity)
+    similar_movies = similar_movies.sort_values(by="rating", ascending=False)
+
+    # Limit to 6 movies
+    similar_movies = similar_movies.head(6)
+
+    return jsonify(similar_movies.to_dict(orient="records"))
+
 @app.route("/search", methods=["GET"])
 def search_movies():
     query = request.args.get("query", "").strip().lower()

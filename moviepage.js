@@ -58,8 +58,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Update rating
             document.querySelector(".right ul:nth-of-type(3)").innerHTML = `<li>${movie.rating}/10</li>`;
+
+            // Fetch and display similar movies
+            fetchSimilarMovies(movieId);
         } catch (error) {
             console.error("Error fetching movie details:", error);
+        }
+    }
+
+    async function fetchSimilarMovies(movieId) {
+        try {
+            const response = await fetch(`http://localhost:8000/similar-movies/${movieId}`);
+            const similarMovies = await response.json();
+
+            const similarMoviesContainer = document.querySelector(".similar-movies");
+            similarMoviesContainer.innerHTML = similarMovies
+                .map(movie => `
+                    <div class="similar-movie" onclick="window.location.href='moviepage.html?id=${movie['Movie ID']}'">
+                        <img src="http://localhost:8000/images/posters/${movie.image_id}" alt="${movie.Title}" class="poster">
+                        <img src="http://localhost:8000/images/backdrops/${movie.image_id}" alt="${movie.Title}" class="backdrop">
+                        <h4>${movie.Title}</h4>
+                        <div class="movie-details">
+                            <h3>${movie.Title}</h3>
+                            <p>Rating: ${movie.rating}</p>
+                            <p>${movie.Overview || "No overview available."}</p>
+                            <button onclick="window.location.href='moviepage.html?id=${movie['Movie ID']}';">More Info</button>
+                        </div>
+                    </div>
+                `)
+                .join("");
+        } catch (error) {
+            console.error("Error fetching similar movies:", error);
         }
     }
 
