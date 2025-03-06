@@ -14,6 +14,7 @@ IMAGE_DIR = r"C:\Users\user\Desktop\movrec_data\images"
 movies_path = os.path.join(DATA_DIR, "movie_2.csv")
 ratings_path = os.path.join(DATA_DIR, "avgrating.csv")
 genres_path = os.path.join(DATA_DIR, "genres.csv")
+similarities_path = os.path.join(DATA_DIR, "movie_similarities.csv")
 
 # Check if files exist
 if not os.path.exists(movies_path):
@@ -22,16 +23,20 @@ if not os.path.exists(ratings_path):
     print(f"Error: File not found - {ratings_path}")
 if not os.path.exists(genres_path):
     print(f"Error: File not found - {genres_path}")
+if not os.path.exists(similarities_path):
+    print(f"Error: File not found - {similarities_path}")
 
 # Load data into DataFrames
 movies_df = pd.read_csv(movies_path) if os.path.exists(movies_path) else pd.DataFrame()
 ratings_df = pd.read_csv(ratings_path) if os.path.exists(ratings_path) else pd.DataFrame()
 genres_df = pd.read_csv(genres_path) if os.path.exists(genres_path) else pd.DataFrame()
+similarities_df = pd.read_csv(similarities_path) if os.path.exists(similarities_path) else pd.DataFrame()
 
 # Ensure column names are correct
 print("Movies DataFrame Columns:", movies_df.columns)
 print("Ratings DataFrame Columns:", ratings_df.columns)
 print("Genres DataFrame Columns:", genres_df.columns)
+print("Similarities DataFrame Columns:", similarities_df.columns)
 
 # Convert movie ID to string in all DataFrames
 if "Movie ID" not in movies_df.columns:
@@ -51,6 +56,10 @@ if "movie_id" not in genres_df.columns:
     genres_df = pd.DataFrame()
 else:
     genres_df["movie_id"] = genres_df["movie_id"].astype(str)
+
+if not similarities_df.empty:
+    similarities_df["movie_id"] = similarities_df["movie_id"].astype(str)
+    similarities_df["similar_movie_id"] = similarities_df["similar_movie_id"].astype(str)
 
 # Merge movies with ratings and genres
 if not movies_df.empty and not ratings_df.empty:
@@ -154,35 +163,22 @@ def get_similar_movies(movie_id):
     if "Movie ID" not in movies_df.columns:
         return jsonify({"error": "Movie data not available"}), 500
 
+    # Check if the movie exists
     movie = movies_df[movies_df["Movie ID"] == movie_id]
     if movie.empty:
         return jsonify({"error": "Movie not found"}), 404
 
-    movie_data = movie.iloc[0].to_dict()
-    director = movie_data.get("Director")
-    cast = movie_data.get("Cast", "").split(",") if movie_data.get("Cast") else []
-    genres = movie_data.get("genres", [])
+    # Get similar movie IDs from the similarities DataFrame
+    similar_movie_ids = similarities_df[similarities_df["movie_id"] == movie_id]["similar_movie_id"].tolist()
 
-    # Find movies with the same director or at least one common star
-    similar_movies = movies_df[
-        (movies_df["Director"] == director) | 
-        (movies_df["Cast"].apply(lambda x: any(star in x for star in cast) if x else False))
-    ]
+    # Fetch details of similar movies from the movies DataFrame
+    similar_movies = movies_df[movies_df["Movie ID"].isin(similar_movie_ids)]
 
-    # Add movies with similar genres
-    genre_movies = movies_df[movies_df["Movie ID"].isin(genres_df[genres_df["genre"].isin(genres)]["movie_id"].unique())]
+    # Ensure no duplicates (though the CSV should already have unique entries)
+    similar_movies = similar_movies.drop_duplicates(subset=["Movie ID"])
 
-    # Combine both sets of movies
-    similar_movies = pd.concat([similar_movies, genre_movies]).drop_duplicates(subset=["Movie ID"])
-
-    # Exclude the current movie
-    similar_movies = similar_movies[similar_movies["Movie ID"] != movie_id]
-
-    # Sort by rating (popularity)
-    similar_movies = similar_movies.sort_values(by="rating", ascending=False)
-
-    # Limit to 6 movies
-    similar_movies = similar_movies.head(6)
+    # Sort by rating (popularity) and limit to 10 movies
+    similar_movies = similar_movies.sort_values(by="rating", ascending=False).head(10)
 
     return jsonify(similar_movies.to_dict(orient="records"))
 
