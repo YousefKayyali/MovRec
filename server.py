@@ -2,6 +2,7 @@ from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 import pandas as pd
 import os
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)
@@ -15,6 +16,7 @@ movies_path = os.path.join(DATA_DIR, "movie_2.csv")
 ratings_path = os.path.join(DATA_DIR, "avgrating.csv")
 genres_path = os.path.join(DATA_DIR, "genres.csv")
 similarities_path = os.path.join(DATA_DIR, "movie_similarities.csv")
+decades_path = os.path.join(DATA_DIR, "decades.csv")
 
 # Check if files exist
 if not os.path.exists(movies_path):
@@ -25,18 +27,22 @@ if not os.path.exists(genres_path):
     print(f"Error: File not found - {genres_path}")
 if not os.path.exists(similarities_path):
     print(f"Error: File not found - {similarities_path}")
+if not os.path.exists(decades_path):
+    print(f"Error: File not found - {decades_path}")
 
 # Load data into DataFrames
 movies_df = pd.read_csv(movies_path) if os.path.exists(movies_path) else pd.DataFrame()
 ratings_df = pd.read_csv(ratings_path) if os.path.exists(ratings_path) else pd.DataFrame()
 genres_df = pd.read_csv(genres_path) if os.path.exists(genres_path) else pd.DataFrame()
 similarities_df = pd.read_csv(similarities_path) if os.path.exists(similarities_path) else pd.DataFrame()
+decades_df = pd.read_csv(decades_path) if os.path.exists(decades_path) else pd.DataFrame()
 
 # Ensure column names are correct
 print("Movies DataFrame Columns:", movies_df.columns)
 print("Ratings DataFrame Columns:", ratings_df.columns)
 print("Genres DataFrame Columns:", genres_df.columns)
 print("Similarities DataFrame Columns:", similarities_df.columns)
+print("Decades DataFrame Columns:", decades_df.columns)
 
 # Convert movie ID to string in all DataFrames
 if "Movie ID" not in movies_df.columns:
@@ -94,11 +100,12 @@ def get_movies():
     if movies_df.empty:
         return jsonify({"error": "No movies found"}), 404
 
-    # Get pagination, sorting, and genre parameters
+    # Get pagination, sorting, genre, and decade parameters
     page = int(request.args.get("page", 1))
     per_page = int(request.args.get("per_page", 100))
     sort_by = request.args.get("sort_by", "rating")
     genres = request.args.getlist("genre")  # Get list of genres
+    decades = request.args.getlist("decade")  # Get list of decades
 
     # Filter movies by genres if provided
     if genres:
@@ -109,6 +116,14 @@ def get_movies():
         filtered_movies = movies_df[movies_df["Movie ID"].isin(genre_movie_ids)]
     else:
         filtered_movies = movies_df
+
+    # Filter movies by decades if provided
+    if decades:
+        decades = [int(decade) for decade in decades]
+        filtered_movies = filtered_movies[filtered_movies["Release Date"].notna()]
+        filtered_movies = filtered_movies[
+            (filtered_movies["Release Date"].str[:4].astype(int) // 10 * 10).isin(decades)
+        ]
 
     # Sort movies by rating (descending)
     sorted_movies = filtered_movies.sort_values(by=sort_by, ascending=False)
@@ -138,6 +153,14 @@ def get_genres():
     unique_genres = genres_df["genre"].unique().tolist()
     return jsonify(unique_genres)
 
+@app.route("/decades", methods=["GET"])
+def get_decades():
+    if decades_df.empty:
+        return jsonify({"error": "No decades found"}), 404
+
+    unique_decades = decades_df["Decade"].unique().tolist()
+    return jsonify(unique_decades)
+
 @app.route("/movie/<movie_id>", methods=["GET"])
 def get_movie_details(movie_id):
     if "Movie ID" not in movies_df.columns:
@@ -160,27 +183,37 @@ def get_movie_details(movie_id):
 
 @app.route("/similar-movies/<movie_id>", methods=["GET"])
 def get_similar_movies(movie_id):
-    if "Movie ID" not in movies_df.columns:
-        return jsonify({"error": "Movie data not available"}), 500
+    try:
+        # Check if the movie exists
+        movie = movies_df[movies_df["Movie ID"] == movie_id]
+        if movie.empty:
+            return jsonify({"error": "Movie not found"}), 404
 
-    # Check if the movie exists
-    movie = movies_df[movies_df["Movie ID"] == movie_id]
-    if movie.empty:
-        return jsonify({"error": "Movie not found"}), 404
+        # Get similar movie IDs
+        similar_movie_ids = similarities_df[similarities_df["movie_id"] == movie_id]["similar_movie_id"].tolist()
+        if not similar_movie_ids:
+            return jsonify({"error": "No similar movies found"}), 404
 
-    # Get similar movie IDs from the similarities DataFrame
-    similar_movie_ids = similarities_df[similarities_df["movie_id"] == movie_id]["similar_movie_id"].tolist()
+        # Fetch details of similar movies
+        similar_movies = movies_df[movies_df["Movie ID"].isin(similar_movie_ids)]
 
-    # Fetch details of similar movies from the movies DataFrame
-    similar_movies = movies_df[movies_df["Movie ID"].isin(similar_movie_ids)]
+        # Remove duplicates based on Movie ID
+        similar_movies = similar_movies.drop_duplicates(subset=["Movie ID"])
 
-    # Ensure no duplicates (though the CSV should already have unique entries)
-    similar_movies = similar_movies.drop_duplicates(subset=["Movie ID"])
+        # Replace NaN values in the 'rating' column with 0
+        similar_movies["rating"] = similar_movies["rating"].fillna(0)
 
-    # Sort by rating (popularity) and limit to 10 movies
-    similar_movies = similar_movies.sort_values(by="rating", ascending=False).head(10)
+        if similar_movies.empty:
+            return jsonify({"error": "Similar movies not found in database"}), 404
 
-    return jsonify(similar_movies.to_dict(orient="records"))
+        # Sort and limit results
+        similar_movies = similar_movies.sort_values(by="rating", ascending=False).head(15)
+
+        # Convert to JSON and return
+        return jsonify(similar_movies.to_dict(orient="records"))
+    except Exception as e:
+        print(f"Error fetching similar movies: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route("/search", methods=["GET"])
 def search_movies():

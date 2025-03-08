@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const movieContainer = document.querySelector(".movie-container");
     const genreDropdown = document.getElementById("genre-dropdown");
+    const decadeDropdown = document.getElementById("decade-dropdown");
     const searchInput = document.getElementById("search-input");
     const autocompleteResults = document.getElementById("autocomplete-results");
     const logo = document.getElementById("logo");
@@ -9,13 +10,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     let isLoading = false;
     let allMovies = [];
     let selectedGenres = new Set();
+    let selectedDecades = new Set();
 
-    // Check for genre query parameter in the URL
+    // Check for genre or decade query parameters in the URL
     const urlParams = new URLSearchParams(window.location.search);
     const genreFromURL = urlParams.get("genre");
+    const decadeFromURL = urlParams.get("decade");
 
     if (genreFromURL) {
         selectedGenres.add(genreFromURL);
+    }
+    if (decadeFromURL) {
+        selectedDecades.add(decadeFromURL);
     }
 
     // Redirect to homepage without query parameters when logo is clicked
@@ -31,6 +37,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (selectedGenres.size > 0) {
                 selectedGenres.forEach(genre => {
                     url += `&genre=${genre}`;
+                });
+            }
+            if (selectedDecades.size > 0) {
+                selectedDecades.forEach(decade => {
+                    url += `&decade=${decade}`;
                 });
             }
             const response = await fetch(url);
@@ -119,6 +130,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // Fetch decades from the backend
+    async function fetchDecades() {
+        try {
+            const response = await fetch("http://localhost:8000/decades");
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error fetching decades:", error);
+            return [];
+        }
+    }
+
     // Populate the dropdown with genres
     async function populateGenres() {
         const genres = await fetchGenres();
@@ -153,11 +179,46 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // Populate the dropdown with decades
+    async function populateDecades() {
+        const decades = await fetchDecades();
+        if (decades.length > 0) {
+            decades.forEach(decade => {
+                const decadeItem = document.createElement("div");
+                decadeItem.classList.add("dropdown-item");
+                decadeItem.textContent = decade;
+                if (selectedDecades.has(decade)) {
+                    decadeItem.classList.add("selected");
+                }
+                decadeItem.addEventListener("click", () => {
+                    if (selectedDecades.has(decade)) {
+                        selectedDecades.delete(decade);
+                        decadeItem.classList.remove("selected");
+                    } else {
+                        selectedDecades.add(decade);
+                        decadeItem.classList.add("selected");
+                    }
+                    allMovies = [];
+                    movieContainer.innerHTML = "";
+                    currentPage = 1;
+                    loadInitialMovies();
+                });
+                decadeDropdown.appendChild(decadeItem);
+            });
+        } else {
+            const noDecades = document.createElement("div");
+            noDecades.classList.add("dropdown-item");
+            noDecades.textContent = "No decades available";
+            decadeDropdown.appendChild(noDecades);
+        }
+    }
+
     // Fetch and render initial movies
     loadInitialMovies();
 
-    // Populate genres when the page loads
+    // Populate genres and decades when the page loads
     populateGenres();
+    populateDecades();
 
     // Search functionality
     searchInput.addEventListener("input", async (e) => {

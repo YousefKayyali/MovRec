@@ -111,7 +111,70 @@ body {
     background: #e00000;
 }
 
-/* More Like This Section */
+/* Carousel Styles for More Like This */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+.carousel-track-container {
+    overflow: hidden;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.carousel-track li {
+    min-width: 20%; /* 5 items visible (100/5 = 20%) */
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+.carousel-track li .similar-movie {
+    position: relative;
+    background: #1e1e1e;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.carousel-track li .similar-movie:hover {
+    transform: scale(1.05);
+    z-index: 200;
+}
+
+/* Carousel arrow buttons */
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 100;
+}
+
+.carousel-button.prev {
+    left: 10px;
+}
+
+.carousel-button.next {
+    right: 10px;
+}
+
+/* More Like This Section Heading */
 .more-like-this {
     padding: 40px;
     max-width: 1200px;
@@ -126,6 +189,7 @@ body {
     margin-bottom: 20px;
 }
 
+/* Similar Movies Grid */
 .similar-movies {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -270,77 +334,32 @@ body {
 
 /* Animations */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .header h1 {
-        font-size: 2.5rem;
-    }
-
-    .header h2 {
-        font-size: 1.5rem;
-    }
-
-    .header img {
-        width: 250px;
-    }
-
-    .content {
-        padding: 20px;
-        gap: 20px;
-    }
-
-    .left, .right {
-        padding: 20px;
-    }
-
-    .left h3, .right h3 {
-        font-size: 1.5rem;
-    }
-
-    .left p {
-        font-size: 1rem;
-    }
-
-    .tags span {
-        font-size: 0.8rem;
-    }
-
-    .right ul li {
-        font-size: 1rem;
-    }
-
-    .footer button {
-        font-size: 1rem;
-        padding: 10px 20px;
-    }
+    .header h1 { font-size: 2.5rem; }
+    .header h2 { font-size: 1.5rem; }
+    .header img { width: 250px; }
+    .content { padding: 20px; gap: 20px; }
+    .left, .right { padding: 20px; }
+    .left h3, .right h3 { font-size: 1.5rem; }
+    .left p { font-size: 1rem; }
+    .tags span { font-size: 0.8rem; }
+    .right ul li { font-size: 1rem; }
+    .footer button { font-size: 1rem; padding: 10px 20px; }
+    /* For smaller screens, show fewer carousel items */
+    .carousel-track li { min-width: 50%; }
 }

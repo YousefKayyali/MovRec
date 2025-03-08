@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
-from tqdm import tqdm  # for progress bar
+from tqdm import tqdm
 
-# Set data path to the desired output location
+# Set data path to your data location
 data_path = r"C:\Users\user\Desktop\movrec_data\update_3"
 
 # Load CSV files
@@ -14,6 +14,7 @@ movies_df = pd.read_csv(os.path.join(data_path, "movie_2.csv"))
 ratings_df = pd.read_csv(os.path.join(data_path, "rating_2.csv"))
 
 # --- Preprocessing ---
+# Rename and standardize movie ID column
 movies_df.rename(columns={"Movie ID": "movieId"}, inplace=True)
 movies_df['movieId'] = movies_df['movieId'].astype(str)
 genres_df['movie_id'] = genres_df['movie_id'].astype(str)
@@ -23,21 +24,24 @@ ratings_df['movieId'] = ratings_df['movieId'].astype(str)
 genres_agg = genres_df.groupby('movie_id')['genre'].apply(set).to_dict()
 movies_df['genres'] = movies_df['movieId'].apply(lambda x: genres_agg.get(x, set()))
 
-# Process cast: assume names are comma separated.
-movies_df['cast_set'] = movies_df['Cast'].fillna("").apply(lambda x: set(n.strip() for n in x.split(',')) if x != "" else set())
+# Process Cast: convert comma-separated string into a set
+movies_df['cast_set'] = movies_df['Cast'].fillna("").apply(
+    lambda x: set(n.strip() for n in x.split(',')) if x != "" else set()
+)
 
-# Process director: fill missing values and strip whitespace.
+# Process Director: strip whitespace and fill missing values
 movies_df['director'] = movies_df['Director'].fillna("").apply(lambda x: x.strip())
 
-# Fill missing overview with an empty string.
+# Process Production Companies: convert comma-separated string into a set
+movies_df['prod_companies'] = movies_df['Production Companies'].fillna("").apply(
+    lambda x: set(n.strip() for n in x.split(',')) if x != "" else set()
+)
+
+# Fill missing Overview with an empty string
 movies_df['Overview'] = movies_df['Overview'].fillna("")
 
-# --- Determine Which Movies Have Enough Ratings ---
-ratings_count = ratings_df.groupby('movieId').size()
-threshold = 50  # threshold for using collaborative filtering
-movies_with_enough_ratings = set(ratings_count[ratings_count >= threshold].index)
-
 # --- Collaborative Filtering Setup ---
+# Create pivot table for ratings and compute cosine similarity
 rating_matrix = ratings_df.pivot_table(index='movieId', columns='userId', values='rating').fillna(0)
 cf_similarity = cosine_similarity(rating_matrix)
 movie_ids_cf = rating_matrix.index.tolist()
@@ -48,10 +52,10 @@ tfidf = TfidfVectorizer(stop_words='english')
 tfidf_matrix = tfidf.fit_transform(movies_df['Overview'])
 overview_sim_matrix = cosine_similarity(tfidf_matrix)
 
-# Create mapping from movieId to index in movies_df
+# Mapping from movieId to index in movies_df for TF-IDF lookup
 movieId_to_index = {row['movieId']: idx for idx, row in movies_df.iterrows()}
 
-# --- Similarity Functions ---
+# --- Define Jaccard Similarity Function for Set-Based Features ---
 def jaccard_similarity(set1, set2):
     if not set1 or not set2:
         return 0.0
@@ -59,63 +63,72 @@ def jaccard_similarity(set1, set2):
     union = len(set1.union(set2))
     return intersection / union if union != 0 else 0
 
-def content_similarity(movie1, movie2, overview_sim):
-    # Genre similarity (Jaccard)
-    genre_sim = jaccard_similarity(movie1['genres'], movie2['genres'])
-    # Cast similarity (Jaccard)
-    cast_sim = jaccard_similarity(movie1['cast_set'], movie2['cast_set'])
-    # Director similarity (1 if same and not empty)
-    director_sim = 1 if (movie1['director'] and movie1['director'] == movie2['director']) else 0
-    # Overview similarity is provided from the precomputed matrix
-    overview_sim_val = overview_sim
-    # Combined weighted score (adjust weights as needed)
-    score = 0.3 * genre_sim + 0.3 * cast_sim + 0.2 * director_sim + 0.2 * overview_sim_val
-    return score
+# --- Build Recommendations with a 30% CF / 70% Content Hybrid ---
+results = []  # To store recommendation pairs
 
-# --- Build Recommendations ---
-results = []  # store recommendation pairs
-
-# Using tqdm to track progress through movies
 for idx, movie in tqdm(movies_df.iterrows(), total=movies_df.shape[0], desc="Processing movies"):
     current_movie_id = movie['movieId']
+    idx1 = movieId_to_index[current_movie_id]
     sim_scores = {}
     
-    if current_movie_id in movies_with_enough_ratings and current_movie_id in cf_similarity_df.index:
-        # Use collaborative filtering
-        sims = cf_similarity_df.loc[current_movie_id].drop(current_movie_id)
-        top_similar = sims.sort_values(ascending=False).head(10)
-        for sim_movie_id, score in top_similar.items():
-            sim_scores[sim_movie_id] = score
-    else:
-        # Use content-based filtering
-        # Restrict candidate pool: only movies sharing at least one genre (if available)
-        if movie['genres']:
-            candidate_df = movies_df[movies_df['movieId'] != current_movie_id].copy()
-            candidate_df = candidate_df[candidate_df['genres'].apply(lambda x: len(movie['genres'].intersection(x)) > 0)]
+    # Compare current movie with every other movie
+    for _, candidate in movies_df[movies_df['movieId'] != current_movie_id].iterrows():
+        candidate_movie_id = candidate['movieId']
+        idx2 = movieId_to_index[candidate_movie_id]
+        
+        # --- Collaborative Filtering (CF) Component ---
+        if current_movie_id in rating_matrix.index and candidate_movie_id in rating_matrix.index:
+            cf_sim = cf_similarity_df.loc[current_movie_id, candidate_movie_id]
         else:
-            candidate_df = movies_df[movies_df['movieId'] != current_movie_id]
+            cf_sim = None  # CF score not available
         
-        # Get index for current movie in the TF-IDF matrix
-        idx1 = movieId_to_index[current_movie_id]
+        # --- Content-Based Component ---
+        # Overview (story theme) similarity from TF-IDF cosine similarity
+        overview_sim_val = overview_sim_matrix[idx1, idx2]
         
-        # Compute similarities for each candidate in the reduced pool.
-        for _, candidate in candidate_df.iterrows():
-            candidate_movie_id = candidate['movieId']
-            idx2 = movieId_to_index[candidate_movie_id]
-            overview_sim_val = overview_sim_matrix[idx1, idx2]
-            score = content_similarity(movie, candidate, overview_sim_val)
-            sim_scores[candidate_movie_id] = score
+        # Director similarity: 1 if directors match and are non-empty; else 0.
+        director_sim = 1 if movie['director'] and candidate['director'] and movie['director'] == candidate['director'] else 0
         
-        # Get top 10 candidates by content similarity score.
-        sim_scores = dict(sorted(sim_scores.items(), key=lambda x: x[1], reverse=True)[:10])
+        # Cast similarity using Jaccard similarity
+        cast_sim = jaccard_similarity(movie['cast_set'], candidate['cast_set'])
+        
+        # Genres similarity using Jaccard similarity
+        genre_sim = jaccard_similarity(movie['genres'], candidate['genres'])
+        
+        # Production Companies similarity using Jaccard similarity
+        prod_comp_sim = jaccard_similarity(movie['prod_companies'], candidate['prod_companies'])
+        
+        # Compute raw content score with specified weights:
+        # 30% overview, 15% director, 5% cast, 10% genres, 10% production companies
+        content_raw = (0.30 * overview_sim_val + 
+                       0.15 * director_sim + 
+                       0.05 * cast_sim + 
+                       0.10 * genre_sim + 
+                       0.10 * prod_comp_sim)
+        # Normalize content score (max possible raw score is 0.70)
+        content_sim = content_raw / 0.70
+        
+        # --- Combine the Two Scores ---
+        # Use CF component if available; otherwise, fallback to content similarity.
+        if cf_sim is not None:
+            combined_score = 0.30 * cf_sim + 0.70 * content_sim
+        else:
+            combined_score = content_sim
+        
+        sim_scores[candidate_movie_id] = combined_score
     
-    # Save each recommendation pair into results.
-    for sim_movie_id in sim_scores.keys():
-        results.append({'movie_id': current_movie_id, 'similar_movie_id': sim_movie_id})
+    # For the current movie, select the top 15 similar movies.
+    top_similar = sorted(sim_scores.items(), key=lambda x: x[1], reverse=True)[:15]
+    for sim_movie_id, score in top_similar:
+        results.append({
+            'movie_id': current_movie_id,
+            'similar_movie_id': sim_movie_id,
+            'score': score
+        })
 
-# Write results to CSV in the specified directory.
+# Write recommendations to CSV.
 results_df = pd.DataFrame(results)
-output_file = os.path.join(data_path, "movie_similarities.csv")
+output_file = os.path.join(data_path, "movie_similarities_30_70_new.csv")
 results_df.to_csv(output_file, index=False)
 
 print(f"Recommendation CSV created at: {output_file}")

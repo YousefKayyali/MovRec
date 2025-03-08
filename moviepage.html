@@ -1,50 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Details</title>
-    <link rel="stylesheet" href="moviepage.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Details</title>
+  <link rel="stylesheet" href="moviepage.css">
 </head>
 <body>
-    <div class="header" style="--backdrop-url: url('');">
-        <h1><!-- Movie Title --></h1>
-        <h2><!-- Movie Year --></h2>
-        <!-- Movie Poster -->
-        <img id="movie-poster" src="" alt="Movie Poster">
+  <div class="header" style="--backdrop-url: url('');">
+    <h1><!-- Movie Title --></h1>
+    <h2><!-- Movie Year --></h2>
+    <!-- Movie Poster -->
+    <img id="movie-poster" src="" alt="Movie Poster">
+  </div>
+  <div class="content">
+    <div class="left">
+      <h3>Description</h3>
+      <p><!-- Movie Overview --></p>
+      <div class="tags">
+        <!-- Genres will be dynamically inserted here -->
+      </div>
     </div>
-    <div class="content">
-        <div class="left">
-            <h3>Description</h3>
-            <p><!-- Movie Overview --></p>
-            <div class="tags">
-                <!-- Genres will be dynamically inserted here -->
-            </div>
-        </div>
-        <div class="right">
-            <h3>Director</h3>
-            <ul>
-                <li><!-- Director Name --></li>
-            </ul>
-            <h3>Stars</h3>
-            <ul>
-                <!-- Cast will be dynamically inserted here -->
-            </ul>
-            <h3>Rating</h3>
-            <ul>
-                <li><!-- Movie Rating --></li>
-            </ul>
-        </div>
+    <div class="right">
+      <h3>Director</h3>
+      <ul>
+        <li><!-- Director Name --></li>
+      </ul>
+      <h3>Stars</h3>
+      <ul>
+        <!-- Cast will be dynamically inserted here -->
+      </ul>
+      <h3>Rating</h3>
+      <ul>
+        <li><!-- Movie Rating --></li>
+      </ul>
     </div>
-    <div class="more-like-this">
-        <h3>More Like This</h3>
-        <div class="similar-movies">
-            <!-- Similar movies will be dynamically inserted here -->
-        </div>
+  </div>
+  <!-- Updated Carousel for More Like This -->
+  <div class="more-like-this">
+    <h3>More Like This</h3>
+    <div class="carousel-container">
+      <button class="carousel-button prev">&#9664;</button>
+      <div class="carousel-track-container">
+        <ul class="carousel-track">
+          <!-- Similar movies will be dynamically inserted here as <li> items -->
+        </ul>
+      </div>
+      <button class="carousel-button next">&#9654;</button>
     </div>
-    <div class="footer">
-        <button onclick="window.history.back()">Go Back</button>
-    </div>
-    <script src="moviepage.js"></script>
+  </div>
+  <div class="footer">
+    <button onclick="window.history.back()">Go Back</button>
+  </div>
+  <script src="moviepage.js"></script>
 </body>
 </html>
