@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Profile - IMDb Style</title>
+    <link rel="stylesheet" href="userpage.css" />
+  </head>
+  <body>
+    <header class="movrec-header">
+      <div class="movrec-logo">
+        <a href="homepage.html" data-tooltip="Go to Homepage">
+          <img src="logo.jpeg" alt="MovRec Logo" />
+        </a>
+      </div>
+      <nav>
+        <ul class="movrec-nav">
+          <li class="preview-container">
+            <a href="movies.html" class="preview-trigger" data-tooltip="Browse Movies">Movies
+              <div class="preview-content">
+                <div class="preview-image" style="background-image: url('Screenshot_27-3-2025_164949_.jpeg')"></div>
+                <div class="preview-info">
+                  <h3 class="preview-title">Browse Our Movie Collection</h3>
+                  <div class="preview-meta">Thousands of titles</div>
+                  <p class="preview-description">Discover new releases, classics, and hidden gems in our extensive movie database.</p>
+                </div>
+              </div>
+            </a>
+          </li>
+          <li class="preview-container">
+            <a href="#" class="preview-trigger" data-tooltip="View Your Rating">Rating
+              <div class="preview-content">
+                <div class="preview-image" style="background-image: url('https://source.unsplash.com/random/300x170/?stars')"></div>
+                <div class="preview-info">
+                  <h3 class="preview-title">Your Ratings</h3>
+                  <div class="preview-meta">Personalized collection</div>
+                  <p class="preview-description">View and manage all the movies you've rated. See how your tastes evolve over time.</p>
+                </div>
+              </div>
+            </a>
+          </li>
+          <li class="preview-container">
+            <a href="#" class="preview-trigger" data-tooltip="Get Recommendations">Recommendations
+              <div class="preview-content">
+                <div class="preview-image" style="background-image: url('https://source.unsplash.com/random/300x170/?recommend')"></div>
+                <div class="preview-info">
+                  <h3 class="preview-title">Personal Recommendations</h3>
+                  <div class="preview-meta">Tailored just for you</div>
+                  <p class="preview-description">Get movie suggestions based on your viewing history and ratings.</p>
+                </div>
+              </div>
+            </a>
+          </li>
+          <li class="preview-container">
+            <a href="#" class="preview-trigger" data-tooltip="View Your Watch List">Watch List
+              <div class="preview-content">
+                <div class="preview-image" style="background-image: url('https://source.unsplash.com/random/300x170/?watchlist')"></div>
+                <div class="preview-info">
+                  <h3 class="preview-title">Your Watchlist</h3>
+                  <div class="preview-meta">Movies to watch later</div>
+                  <p class="preview-description">Manage the movies you've saved to watch later. Never forget a movie you wanted to see.</p>
+                </div>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="profile-container">
+      <div class="profile-header">
+        <div class="profile-info">
+          <h1>User Name</h1>
+          <p class="username">@username</p>
+        </div>
+      </div> 
+       
+
+      <div class="profile-details">
+        <div class="detail-section">
+          <h2>Account Details</h2>
+          <div class="detail-item">
+            <label>Email</label>
+            <input type="text" class="input-field" id="username" value="Email" readonly />
+            <button class="button-edit" onclick="enableEdit('Email')">Edit</button>
+          </div>
+          <div class="detail-item">
+            <label>Username</label>
+            <input type="text" class="input-field" id="username" value="username" readonly />
+            <button class="button-edit" onclick="enableEdit('username')">Edit</button>
+          </div>
+          
+          <div class="detail-item">
+            <label>Password</label>
+            <input type="password" class="input-field" id="password" value="password" readonly />
+            <button class="button-edit" onclick="enableEdit('password')">Change Password</button>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h2>Personal Information</h2>
+          <div class="detail-item">
+            <label>Birthday</label>
+            <input type="date" class="input-field" value="1990-01-01" readonly />
+          </div>
+          <div class="detail-item">
+            <label>Age</label>
+            <input type="number" class="input-field" value="33" readonly />
+          </div>
+        </div>
+      </div>
+
+      <button class="button-save">Save Changes</button>
+    </div>
+
+    <script>
+      function enableEdit(fieldId) {
+        const field = document.querySelector(`#${fieldId}`);
+        field.removeAttribute("readonly");
+        field.focus();
+      }
+    </script>
+  </body>
+</html>

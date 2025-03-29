@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="movies.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <img id="logo" class="figma" src="logo.JPEG" alt="Logo">
+            </div>
+            <nav class="navigation-pill-list">
+                <div class="category">
+                    Category
+                    <div class="dropdown" id="genre-dropdown">
+                        <!-- Genres will be populated here dynamically -->
+                    </div>
+                </div>
+                <div class="category">
+                    Decades
+                    <div class="dropdown" id="decade-dropdown">
+                        <!-- Decades will be populated here dynamically -->
+                    </div>
+                </div>
+                <div class="nav-link">Recommendation Movies</div>
+                <div class="nav-link">Watchlist</div>
+                <div class="nav-link">Your Ratings</div>
+            </nav>
+            <div class="header-auth">
+                <button class="button" onclick="window.location.href='Login.html';">Sign In</button>
+                <button class="button-2" onclick="window.location.href='SignUp.html';">Sign Up</button>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-newsletter">
+            <div class="text-content-title">
+                <span class="text-wrapper-2">Search</span>
+            </div>
+            <div class="form-newsletter">
+                <input type="text" class="input-field" id="search-input" placeholder="Search...">
+                <div id="autocomplete-results" class="autocomplete-results"></div>
+                <button class="button-3" onclick="performSearch()">Search</button>
+            </div>
+        </section>
+
+        <!-- Movie Container -->
+        <div class="movie-container"></div>
+    </div>
+
+    <script src="movies.js"></script>
+</body>
+</html>

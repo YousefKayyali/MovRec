@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie Details</title>
   <link rel="stylesheet" href="moviepage.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
   <div class="header" style="--backdrop-url: url('');">
@@ -12,6 +13,7 @@
     <h2><!-- Movie Year --></h2>
     <!-- Movie Poster -->
     <img id="movie-poster" src="" alt="Movie Poster">
+    <button class="watchlist-btn">+ Add to Watch List</button>
   </div>
   <div class="content">
     <div class="left">
@@ -34,6 +36,26 @@
       <ul>
         <li><!-- Movie Rating --></li>
       </ul>
+      <h3>Your Rating</h3>
+      <div class="user-rating">
+        <div class="stars-container">
+          <div class="stars-rating">
+            <span class="star" data-value="1"><i class="far fa-star"></i></span>
+            <span class="star" data-value="2"><i class="far fa-star"></i></span>
+            <span class="star" data-value="3"><i class="far fa-star"></i></span>
+            <span class="star" data-value="4"><i class="far fa-star"></i></span>
+            <span class="star" data-value="5"><i class="far fa-star"></i></span>
+            <span class="star" data-value="6"><i class="far fa-star"></i></span>
+            <span class="star" data-value="7"><i class="far fa-star"></i></span>
+            <span class="star" data-value="8"><i class="far fa-star"></i></span>
+            <span class="star" data-value="9"><i class="far fa-star"></i></span>
+            <span class="star" data-value="10"><i class="far fa-star"></i></span>
+          </div>
+          <div class="rating-value">Rate this</div>
+        </div>
+        <button class="rate-btn" disabled>Rate</button>
+        <button class="remove-rating-btn" disabled>Remove</button>
+      </div>
     </div>
   </div>
   <!-- Updated Carousel for More Like This -->
@@ -53,5 +75,100 @@
     <button onclick="window.history.back()">Go Back</button>
   </div>
   <script src="moviepage.js"></script>
+  <script>
+    // Star rating functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const stars = document.querySelectorAll('.star');
+      const ratingValue = document.querySelector('.rating-value');
+      const rateBtn = document.querySelector('.rate-btn');
+      const removeRatingBtn = document.querySelector('.remove-rating-btn');
+      let currentRating = 0;
+      let selectedRating = 0;
+
+      // Check if user has already rated this movie (from localStorage)
+      const movieId = '123'; // This should be dynamic based on the movie
+      const storedRating = localStorage.getItem(`movieRating_${movieId}`);
+      if (storedRating) {
+        currentRating = parseInt(storedRating);
+        updateStars(currentRating);
+        ratingValue.textContent = `Your rating: ${currentRating}/10`;
+        rateBtn.disabled = true;
+        removeRatingBtn.disabled = false;
+      }
+
+      // Star hover effect
+      stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+          const value = parseInt(this.getAttribute('data-value'));
+          highlightStars(value);
+          ratingValue.textContent = `${value}/10`;
+        });
+
+        star.addEventListener('mouseout', function() {
+          if (selectedRating === 0) {
+            highlightStars(currentRating);
+            ratingValue.textContent = currentRating > 0 ? `Your rating: ${currentRating}/10` : 'Rate this';
+          } else {
+            highlightStars(selectedRating);
+            ratingValue.textContent = `${selectedRating}/10`;
+          }
+        });
+
+        star.addEventListener('click', function() {
+          selectedRating = parseInt(this.getAttribute('data-value'));
+          highlightStars(selectedRating);
+          ratingValue.textContent = `${selectedRating}/10`;
+          rateBtn.disabled = false;
+        });
+      });
+
+      // Rate button click
+      rateBtn.addEventListener('click', function() {
+        if (selectedRating > 0) {
+          currentRating = selectedRating;
+          localStorage.setItem(`movieRating_${movieId}`, currentRating.toString());
+          ratingValue.textContent = `Your rating: ${currentRating}/10`;
+          rateBtn.disabled = true;
+          removeRatingBtn.disabled = false;
+          // Here you would typically send the rating to your backend
+          alert(`Thanks for rating this movie ${currentRating} stars!`);
+        }
+      });
+
+      // Remove rating button
+      removeRatingBtn.addEventListener('click', function() {
+        localStorage.removeItem(`movieRating_${movieId}`);
+        currentRating = 0;
+        selectedRating = 0;
+        highlightStars(0);
+        ratingValue.textContent = 'Rate this';
+        rateBtn.disabled = true;
+        removeRatingBtn.disabled = true;
+        // Here you would typically remove the rating from your backend
+        alert('Your rating has been removed.');
+      });
+
+      function highlightStars(count) {
+        stars.forEach(star => {
+          const value = parseInt(star.getAttribute('data-value'));
+          if (value <= count) {
+            star.innerHTML = '<i class="fas fa-star"></i>';
+          } else {
+            star.innerHTML = '<i class="far fa-star"></i>';
+          }
+        });
+      }
+
+      function updateStars(count) {
+        stars.forEach((star, index) => {
+          if (index < count) {
+            star.innerHTML = '<i class="fas fa-star"></i>';
+          } else {
+            star.innerHTML = '<i class="far fa-star"></i>';
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
