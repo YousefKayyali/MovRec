@@ -1,0 +1,44 @@
+@model MovRec.Models.User
+@{
+    Layout = "_LayoutNoHeader";
+    ViewData["Title"] = "Sign Up";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/SignUp.css"> <!-- Updated path -->
+</head>
+
+<body>
+    <div class="signup-container">
+        <div class="signup-title">Sign Up</div>
+        <form asp-action="SignUp" method="post" id="signUpForm">
+            <input type="text" class="input-field" asp-for="username" placeholder="Username" required />
+            <span asp-validation-for="username" class="text-danger"></span>
+            <input type="email" class="input-field" asp-for="email" placeholder="Email Address" required />
+            <span asp-validation-for="email" class="text-danger"></span>
+            <input type="password" class="input-field" asp-for="password" placeholder="Password" required />
+            <input type="password" class="input-field" asp-for="ConfirmPassword" placeholder="Confirm Password"
+                required />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            <label for="birth_date">Birth Date</label>
+            <input type="date" asp-for="birth_date" class="input-field" id="birth_date" name="birth_date" required
+                asp-format="{0:yyyy-MM-dd}" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+            <span asp-validation-for="birth_date" class="text-danger"></span>
+            <button type="submit" class="button-3">Sign Up</button>
+        </form>
+        <div class="footer-text">
+            Already have an account? <a href="@Url.Action("Login", "Account")">Sign In</a>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+
+</html>

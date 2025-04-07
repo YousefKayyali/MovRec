@@ -1,0 +1,61 @@
+@model MovRec.Models.User
+@{
+    ViewBag.Title = "Your Profile";
+    Layout = "_Layout";
+}
+
+<body>
+    <div class="profile-container">
+        <!-- Header with navigation (same as your original) -->
+        @await Html.PartialAsync("_LoginPartial")
+
+        <div class="profile-header">
+            <div class="profile-info">
+                <h1>@Model.username</h1>
+                <p class="username">@Model.username</p>
+            </div>
+        </div>
+
+        @if (ViewData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@ViewData["SuccessMessage"]</div>
+        }
+
+        <form asp-action="UpdateProfile" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="user_id" />
+
+            <div class="profile-details">
+                <div class="detail-section">
+                    <h2>Account Details</h2>
+                    <div class="detail-item">
+                        <label asp-for="email"></label>
+                        <input asp-for="email" class="input-field" readonly id="email" />
+                        <button type="button" class="button-edit" onclick="enableEdit('email')">Edit</button>
+                        <span asp-validation-for="email" class="text-danger"></span>
+                    </div>
+
+                    <!-- Other fields same pattern -->
+
+                    <div class="detail-item">
+                        <label>Password</label>
+                        <input type="password" class="input-field" value="••••••••" readonly />
+                        <a asp-action="ChangePassword" class="button-edit">Change Password</a>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="button-save">Save Changes</button>
+        </form>
+    </div>
+
+    @section Scripts {
+        <script>
+            function enableEdit(fieldId) {
+                const field = document.getElementById(fieldId);
+                field.removeAttribute("readonly");
+                field.focus();
+            }
+        </script>
+    }
+</body>

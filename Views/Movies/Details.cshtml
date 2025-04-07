@@ -1,0 +1,98 @@
+@model MovieDetailsViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Model.Movie.title;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.Movie.title</title>
+    <link rel="stylesheet" href="~/css/moviepage.css">
+</head>
+
+<body>
+    <div class="header-movie" style="--backdrop-url: url('');">
+        <h1>@Model.Movie.title</h1>
+        <h2>@Model.Movie.release_date.Year</h2>
+        <img id="movie-poster" src="~/images/posters/@(Model.Movie.movie_id)_poster.jpg" alt="Movie Poster">
+        <button class="watchlist-btn">+ Add to Watch List</button>
+    </div>
+
+    <div class="content">
+        <div class="left">
+            <h3>Description</h3>
+            <p>@Model.Movie.over_review</p>
+            <div class="tags">
+                <span>Duration: @Model.Movie.runtime mins</span>
+                <span>Director: @Model.Movie.director</span>
+            </div>
+        </div>
+        <div class="right">
+            <h3>Cast</h3>
+            <ul>
+                @foreach (var cast in Model.Movie.casts.Split(","))
+                {
+                    <li>@cast</li>
+                }
+            </ul>
+            <h3>Rating</h3>
+            <ul>
+                <li>@Model.Movie.avg_rate / 10</li>
+            </ul>
+            <h3>Your Rating</h3>
+            <div class="user-rating">
+                <div class="stars-container">
+                    @for (int i = 1; i <= 10; i++)
+                    {
+                        var filled = Model.UserRating.HasValue && Model.UserRating.Value >= i ? "fas" : "far";
+                        <span class="star" data-value="@i">
+                            <i class="@filled fa-star"></i>
+                        </span>
+                    }
+                </div>
+                <button id="rate-btn" disabled>Rate</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <button onclick="window.history.back()">Go Back</button>
+    </div>
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars = document.querySelectorAll('.star');
+        let selectedRating = @Model.UserRating ?? 0;
+        const rateBtn = document.getElementById('rate-btn');
+
+        stars.forEach(star => {
+            star.addEventListener('click', function () {
+                selectedRating = this.getAttribute('data-value');
+                highlightStars(selectedRating);
+                rateBtn.disabled = false;
+            });
+        });
+
+        rateBtn.addEventListener('click', function () {
+            fetch('/Movies/RateMovie', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ movieId: @Model.Movie.movie_id, rating: selectedRating })
+            }).then(response => response.json())
+                .then(data => alert("Rating saved successfully!"));
+        });
+
+        function highlightStars(count) {
+            stars.forEach(star => {
+                let value = parseInt(star.getAttribute('data-value'));
+                star.innerHTML = `<i class="${value <= count ? 'fas' : 'far'} fa-star"></i>`;
+            });
+        }
+    });
+</script>
+
+</html>
