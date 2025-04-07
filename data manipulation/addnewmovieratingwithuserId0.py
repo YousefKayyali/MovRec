@@ -1,6 +1,8 @@
 import pandas as pd
-destination = r"D:\movrec\update_4\rating_4.csv"
-source = r"D:\movrec\update_3\rating_3.csv"
+import os 
+os.makedirs('cpdata4',exist_ok=True)
+destination = r"D:\project data\rating data\cpdata4\rating_with_adj.csv"
+source = r"D:\project data\rating data\cpdata3\rating.csv"
 data = pd.read_csv(source)
 print( len(data))
 movie = {}
