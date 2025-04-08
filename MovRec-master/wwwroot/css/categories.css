@@ -1,0 +1,89 @@
+/* Global Styles */
+* {
+    box-sizing: border-box;
+    font-smooth: antialiased;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+    background: url('Background1.png') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    font-family: 'Inter', Helvetica, sans-serif;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Container */
+.container {
+    background-color: rgba(30, 30, 30, 0.9);
+    /* Semi-transparent container */
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    max-width: 800px;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+h1 .highlight {
+    color: #ff0000;
+    /* Updated to red */
+}
+
+/* Categories */
+.categories {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.category {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    border: 1px solid #ff0000;
+    border-radius: 8px;
+    background-color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.category:hover {
+    background-color: #ff0000;
+    transform: scale(1.05);
+}
+
+.category input[type="checkbox"] {
+    margin-right: 10px;
+    accent-color: #ff0000;
+    transform: scale(1.3);
+}
+
+/* Button */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff0000;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    border: none;
+}
+
+button:hover {
+    background-color: #ff0000;
+}
