@@ -1,0 +1,17 @@
+wwwroot/images/posters/
+wwwroot/images/backdrops/
+data_preprocessing/posters/
+data_preprocessing/backdrops/
+
+*.csv
+*.pt
+*.pth
+
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+
+movrec_backup.sql

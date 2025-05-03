@@ -1,0 +1,101 @@
+@model MovRec.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Search Results";
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <link rel="stylesheet" href="~/css/homepage.css">
+    <link rel="stylesheet" href="~/css/search.css">
+    <style>
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .movie-item {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .movie-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .movie-title {
+            padding: 10px;
+            color: white;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .search-header {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 24px;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-newsletter">
+            <div class="text-content-title">
+                <span class="text-wrapper-2">Search Results</span>
+            </div>
+            <div class="search-container">
+                <div class="form-newsletter">
+                    <input type="text" class="input-field" id="search-input" placeholder="Search for movies..."
+                        value="@Context.Request.Query["query"]" autocomplete="off">
+                    <div id="autocomplete-results" class="autocomplete-results"></div>
+                    <button class="button-3" onclick="performSearch()">Search</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Movie Grid -->
+        <section class="movies-section">
+            <div class="search-header">
+                Found @Model.Movies.Count movies
+            </div>
+            <div class="movies-grid">
+                @foreach (var movie in Model.Movies)
+                {
+                    <div class="movie-item">
+                        <a href="@Url.Action("Details", "Movies", new { id = movie.movie_id })">
+                            <img src="~/images/posters/@(movie.movie_id)_poster.jpg" alt="@movie.title"
+                                class="movie-poster">
+                            <div class="movie-title">@movie.title</div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </section>
+    </div>
+
+    <script src="~/js/search.js"></script>
+</body>
+
+</html>

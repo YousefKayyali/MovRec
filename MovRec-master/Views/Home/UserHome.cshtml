@@ -1,0 +1,114 @@
+@model MovRec.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="~/css/homepage.css">
+    <link rel="stylesheet" href="~/css/sliderscss.css">
+    <link rel="stylesheet" href="~/css/search.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-newsletter">
+            <div class="text-content-title">
+                <span class="text-wrapper-2">Search</span>
+            </div>
+            <div class="form-newsletter">
+                <input type="text" class="input-field" id="search-input" placeholder="Search for movies..."
+                    autocomplete="off">
+                <div id="autocomplete-results" class="autocomplete-results"></div>
+                <button class="button-3" onclick="performSearch()">Search</button>
+            </div>
+        </section>
+
+        <!-- Movie Container -->
+        <section class="movies-section">
+            <!-- Recommended Movies -->
+            <div class="main-carousels">
+                <div class="carousel-title">
+                    <span class="text">Recommended Movies</span>
+                </div>
+                <div class="container-slider">
+                    <div class="btn-container">
+                        <span class="btn" onclick="prevSlide(0)">❮</span>
+                    </div>
+                    <div class="carousel-container">
+                        <div class="carousel">
+                            @foreach (var movie in Model.RecoMovies)
+                            {
+                                <div class="poster-container">
+                                    <div class="poster">
+                                        <a href="@Url.Action("Details", "Movies", new { id = movie.movie_id })"
+                                            class="debug"><img src="~/images/posters/@(movie.movie_id)_poster.jpg"
+                                                alt="@movie.title" class="poster" loading="lazy"></a>
+                                        <div class="title">@movie.title</div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="btn-container">
+                        <span class="btn" onclick="nextSlide(0)">❯</span>
+                    </div>
+                </div>
+            </div>
+
+            @{
+                var carouselIndex = 1;
+            }
+
+            @foreach (var genre in Model.UserGenres.Take(3))
+            {
+                <div class="main-carousels">
+                    <div class="carousel-title">
+                        <span class="text">Top @genre Movies</span>
+                    </div>
+                    <div class="container-slider">
+                        <div class="btn-container">
+                            <span class="btn" onclick="prevSlide(@carouselIndex)">❮</span>
+                        </div>
+                        <div class="carousel-container">
+                            <div class="carousel">
+                                @foreach (var movie in Model.GenreMovies[genre])
+                                {
+                                    <div class="poster-container">
+                                        <div class="poster">
+                                            <a href="@Url.Action("Details", "Movies", new { id = movie.movie_id })"
+                                                class="debug"><img src="~/images/posters/@(movie.movie_id)_poster.jpg"
+                                                    alt="@movie.title" class="poster" loading="lazy"></a>
+                                            <div class="title">@movie.title</div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="btn-container">
+                            <span class="btn" onclick="nextSlide(@carouselIndex)">❯</span>
+                        </div>
+                    </div>
+                </div>
+                carouselIndex++;
+            }
+        </section>
+    </div>
+
+    <script src="~/js/slidersjs.js"></script>
+    <script src="~/js/search.js"></script>
+    <script>
+        // Initialize carousels when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            initCarousels();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,2 @@
+first we reduce the dataset by make the max number of rating for user is 600 and the min number of rating for movie is 50
+remove unneed column from movies dataset

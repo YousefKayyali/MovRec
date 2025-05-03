@@ -1,0 +1,201 @@
+@model IEnumerable<MovRec.Models.Movie>
+@{
+    ViewData["Title"] = "Advanced Search";
+    var hasSearched = !string.IsNullOrEmpty(ViewBag.SearchQuery) ||
+    (ViewBag.SelectedGenres != null && ViewBag.SelectedGenres.Count > 0) ||
+    (ViewBag.SelectedDecades != null && ViewBag.SelectedDecades.Count > 0);
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Search</title>
+    <link rel="stylesheet" href="~/css/homepage.css">
+    <link rel="stylesheet" href="~/css/search.css">
+    <style>
+        .genres-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #333333;
+            border-radius: 8px;
+        }
+
+        .decades-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #333333;
+            border-radius: 8px;
+        }
+
+        .genre-checkbox,
+        .decade-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .genre-checkbox:hover,
+        .decade-checkbox:hover {
+            background-color: #444444;
+        }
+
+        .genre-checkbox input[type="checkbox"],
+        .decade-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ff0000;
+        }
+
+        .genre-checkbox label,
+        .decade-checkbox label {
+            color: #cccccc;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px;
+            color: #ffffff;
+            font-size: 1.2rem;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .movie-rating {
+            color: #ffdd57;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-newsletter">
+            <div class="text-content-title">
+                <span class="text-wrapper-2">Advanced Search</span>
+            </div>
+        </section>
+
+        <div class="search-container">
+            <div class="search-filters">
+                <form id="searchForm" method="get" class="search-form">
+                    <div class="filter-group">
+                        <h3>Search</h3>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="searchQuery" name="searchQuery"
+                                value="@ViewBag.SearchQuery" placeholder="Search for movies...">
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h3>Genres</h3>
+                        <div class="genres-container">
+                            @foreach (var genre in ViewBag.Genres)
+                            {
+                                <div class="genre-checkbox">
+                                    <input type="checkbox" id="genre_@genre" name="genres" value="@genre"
+                                        @(ViewBag.SelectedGenres != null && ViewBag.SelectedGenres.Contains(genre) ?
+                                                                            "checked" : "") >
+                                <label for="genre_@genre">@genre</label>
+                            </div>
+                                                        }
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h3>Decades</h3>
+                        <div class="decades-container">
+                            @for (int year = 2020; year >= 1900; year -= 10)
+                            {
+                                var decadeStart = year;
+                                var decadeEnd = year + 9;
+                                var decadeText = $"{decadeStart}s";
+                                <div class="decade-checkbox">
+                                    <input type="checkbox" id="decade_@decadeStart" name="decades" value="@decadeStart"
+                                        @(ViewBag.SelectedDecades != null && ViewBag.SelectedDecades.Contains(decadeStart) ?
+                                                                            "checked" : "") >
+                                <label for="decade_@decadeStart">@decadeText</label>
+                            </div>
+                                                        }
+                        </div>
+                    </div>
+
+                    <div class="search-actions">
+                        <button type="submit" class="search-button">Search</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="search-results">
+                @if (!hasSearched)
+                {
+                    <div class="welcome-message">
+                        <p>Use the filters above to search for movies.</p>
+                        <p>You can search by title, select multiple genres, and choose multiple decades.</p>
+                        <p>Results will be sorted by rating.</p>
+                    </div>
+                }
+                else if (Model != null && Model.Any())
+                {
+                    <div class="results-grid">
+                        @foreach (var movie in Model)
+                        {
+                            <div class="movie-card">
+                                <a href="@Url.Action("Details", "Movies", new { id = movie.movie_id })">
+                                    <img src="~/images/posters/@(movie.movie_id)_poster.jpg" alt="@movie.title">
+                                    <div class="movie-info">
+                                        <h3>@movie.title</h3>
+                                        <p>Released: @movie.release_date.ToString("yyyy")</p>
+                                        @if (movie.avg_rate.HasValue)
+                                        {
+                                            <p class="movie-rating">★ @movie.avg_rate.Value.ToString("0.0")</p>
+                                        }
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="error-message">
+                        No movies found matching your criteria.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            $(document).ready(function () {
+                // Handle form submission
+                $('#searchForm').on('submit', function (e) {
+                    e.preventDefault();
+                    var formData = $(this).serialize();
+                    window.location.href = '@Url.Action("AdvancedSearch", "Movies")?' + formData;
+                });
+            });
+        </script>
+    }
+</body>
+
+</html>

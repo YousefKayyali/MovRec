@@ -1,0 +1,130 @@
+@model IEnumerable<MovRec.Models.Movie>
+@{
+    ViewData["Title"] = "My Watchlist";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Watchlist</title>
+    <link rel="stylesheet" href="~/css/homepage.css">
+    <link rel="stylesheet" href="~/css/search.css">
+    <link rel="stylesheet" href="~/css/watchlist.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-newsletter">
+            <div class="text-content-title">
+                <span class="text-wrapper-2">My Watchlist</span>
+            </div>
+        </section>
+
+        <!-- Movie Grid -->
+        <section class="movies-section">
+            <div class="watchlist-header">
+                @if (Model.Any())
+                {
+                    <div class="watchlist-controls">
+                        <span>Found @Model.Count() movies in your watchlist</span>
+                        <button id="clearWatchlistBtn" class="clear-watchlist-btn">
+                            <i class="fas fa-trash"></i> Clear Watchlist
+                        </button>
+                    </div>
+                }
+            </div>
+            @if (Model.Any())
+            {
+                <div class="movies-grid">
+                    @foreach (var movie in Model)
+                    {
+                        <div class="movie-item">
+                            <a href="@Url.Action("Details", "Movies", new { id = movie.movie_id })">
+                                <img src="~/images/posters/@(movie.movie_id)_poster.jpg" alt="@movie.title"
+                                    class="movie-poster">
+                                <div class="movie-title">@movie.title</div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-watchlist">
+                    <i class="fas fa-film"></i>
+                    <p>Your watchlist is empty</p>
+                    <a href="@Url.Action("Index", "Home")" class="browse-btn">Browse Movies</a>
+                </div>
+            }
+        </section>
+    </div>
+
+    <!-- Custom Modal -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Clear Watchlist</h2>
+            <p class="modal-message">Are you sure you want to remove all movies from your watchlist?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn yes" id="confirmYes">Yes, Clear All</button>
+                <button class="modal-btn no" id="confirmNo">No, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/search.js"></script>
+    <script>
+        const modal = document.getElementById('confirmModal');
+        const clearBtn = document.getElementById('clearWatchlistBtn');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmNo = document.getElementById('confirmNo');
+
+        function showModal() {
+            modal.style.display = 'flex';
+        }
+
+        function hideModal() {
+            modal.style.display = 'none';
+        }
+
+        clearBtn?.addEventListener('click', showModal);
+        confirmNo.addEventListener('click', hideModal);
+
+        confirmYes.addEventListener('click', function () {
+            fetch('@Url.Action("ClearWatchlist", "Movies")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Failed to clear watchlist: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while clearing the watchlist');
+                })
+                .finally(() => {
+                    hideModal();
+                });
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,37 @@
+@{
+    ViewData["Title"] = "Verify Email";
+    Layout = "_LayoutNoHeader";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/Login.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <h1>Verify Your Email</h1>
+        <p style="color: white; margin-bottom: 20px;">Please enter the verification code sent to your email address.</p>
+
+        <form asp-action="VerifyEmail" method="post">
+            <input type="text" name="code" class="input-field" placeholder="Enter verification code" required
+                autocomplete="off" autocorrect="off" />
+            <input type="hidden" name="type" value="@ViewBag.VerificationType" />
+            <button type="submit" class="login-btn">Verify</button>
+        </form>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="error-message">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+            </div>
+        }
+    </div>
+</body>
+
+</html>

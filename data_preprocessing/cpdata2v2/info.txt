@@ -1,0 +1,4 @@
+check movies and ratings dataset and remove any movie that not inside the movies dataset for links movies and ratings
+rating no error
+movies there are some missing value some of it acceptable and some not delete  what we must delete 
+we delete missing data in movies before be sure movies in movies and rating are same

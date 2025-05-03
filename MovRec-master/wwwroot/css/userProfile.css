@@ -1,0 +1,231 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a1a;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.profile-header h1 {
+    font-size: 2.5em;
+    margin: 0;
+    color: white;
+}
+
+.profile-header p {
+    color: #666;
+    margin: 10px 0 0;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 20px 0;
+    color: white;
+}
+
+.no-genres-message {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.no-genres-message p {
+    margin-bottom: 15px;
+    color: #ff0000;
+}
+
+.select-genres-btn {
+    display: inline-block;
+    background-color: #ff0000;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+.select-genres-btn:hover {
+    background-color: #cc0000;
+}
+
+.genres-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.genre-tag {
+    background-color: #333;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.875rem;
+    color: white;
+}
+
+.edit-genres-btn {
+    background-color: #ff0000;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.edit-genres-btn:hover {
+    background-color: #cc0000;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #c36060;
+    margin-bottom: 5px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    color: white;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.input-group-append {
+    display: flex;
+    margin-left: 10px;
+}
+
+.edit-btn,
+.save-btn,
+.cancel-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-left: 5px;
+}
+
+.edit-btn {
+    background-color: #ff0000;
+    color: white;
+}
+
+.save-btn {
+    background-color: #ff0000;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #ff0000;
+    color: white;
+}
+
+.edit-btn:hover,
+.save-btn:hover,
+.cancel-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.text-danger {
+    color: #ff0000;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    display: block;
+}
+
+.change-password-btn {
+    background-color: #ff0000;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.change-password-btn:hover {
+    background-color: #cc0000;
+}
+
+.password-field {
+    letter-spacing: 3px;
+}
+
+/* Navigation styles */
+.nav-container {
+    background-color: #1a1a1a;
+    padding: 15px 0;
+    margin-bottom: 30px;
+}
+
+.nav-links {
+    display: flex;
+    justify-content: flex-end;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 30px;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #ff0000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .profile-header h1 {
+        font-size: 2em;
+    }
+}
+
+/* Add styles for disabled state */
+.form-control:disabled {
+    background-color: #2a2a2a;
+    cursor: not-allowed;
+}
+
+/* Add styles for input focus */
+.form-control:focus {
+    outline: none;
+    border-color: #ff0000;
+    box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.25);
+}

@@ -1,0 +1,172 @@
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.movie-item {
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.movie-item:hover {
+    transform: translateY(-5px);
+}
+
+.movie-poster {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.movie-title {
+    padding: 10px;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+}
+
+.watchlist-header {
+    text-align: center;
+    padding: 20px;
+    color: white;
+    font-size: 24px;
+}
+
+.watchlist-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.clear-watchlist-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.clear-watchlist-btn:hover {
+    background-color: #c82333;
+}
+
+.clear-watchlist-btn i {
+    font-size: 14px;
+}
+
+.empty-watchlist {
+    text-align: center;
+    padding: 50px 20px;
+    color: white;
+}
+
+.empty-watchlist i {
+    font-size: 4rem;
+    color: #ffdd57;
+    margin-bottom: 20px;
+}
+
+.empty-watchlist p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.browse-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.browse-btn:hover {
+    background-color: #45a049;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #1a1a1a;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-title {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.modal-message {
+    color: #ccc;
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.modal-btn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.modal-btn.yes {
+    background-color: #dc3545;
+    color: white;
+}
+
+.modal-btn.yes:hover {
+    background-color: #c82333;
+}
+
+.modal-btn.no {
+    background-color: #6c757d;
+    color: white;
+}
+
+.modal-btn.no:hover {
+    background-color: #5a6268;
+}

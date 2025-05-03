@@ -1,0 +1,89 @@
+@model MovRec.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Recommendations";
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendations</title>
+    <link rel="stylesheet" href="~/css/homepage.css">
+    <link rel="stylesheet" href="~/css/search.css">
+    <style>
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .movie-item {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .movie-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .movie-title {
+            padding: 10px;
+            color: white;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .recommendations-header {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-newsletter">
+            <div class="text-content-title">
+                <span class="text-wrapper-2">Your Recommendations</span>
+            </div>
+        </section>
+
+        <!-- Movie Grid -->
+        <section class="movies-section">
+            <div class="recommendations-header">
+                Recommended Movies
+            </div>
+            <div class="movies-grid">
+                @if (Model.Movies != null && Model.Movies.Any())
+                {
+                            @foreach (var movie in Model.Movies)
+                            {
+                                        <div class="movie-item">
+                                            <a href="@Url.Action("Details", "Movies", new { id = movie.movie_id })">
+                                                <img src="~/images/posters/@(movie.movie_id)_poster.jpg" alt="@movie.title"
+                                                    class="movie-poster">
+                                                <div class="movie-title">@movie.title</div>
+                                            </a>
+                                        </div>
+                            }
+                }
+            
+            </div>
+        </section>
+    </div>
+</body>
+
+</html> 

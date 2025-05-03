@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MovRec</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/header.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo">
+            @if (Context.Session.GetInt32("UserId") != null)
+            {
+                <a href="@Url.Action("UserHome", "Home")">
+                    <img id="logo" class="figma" src="~/images/logo.JPEG" alt="Logo">
+                </a>
+            }
+            else
+            {
+                <a href="@Url.Action("Index", "Home")">
+                    <img id="logo" class="figma" src="~/images/logo.JPEG" alt="Logo">
+                </a>
+            }
+        </div>
+        <button class="mobile-menu-btn" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav class="navigation-pill-list">
+            <div class="nav-link" id="recommendations-link">Recommendations</div>
+            <a href="@Url.Action("Watchlist", "Movies")" class="nav-link">Watch list</a>
+            <a href="@Url.Action("Ratings", "Movies")" class="nav-link">Your Ratings</a>
+            <a href="@Url.Action("AdvancedSearch", "Movies")" class="nav-link">Advanced Search</a>
+        </nav>
+        <div class="header-auth">
+            @if (Context.Session.GetInt32("UserId") != null)
+            {
+                <a href="@Url.Action("UserProfile", "Account")" class="button-2">Profile</a>
+                <form asp-controller="Account" asp-action="Logout" method="post" class="logout-form">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="button-2">Logout</button>
+                </form>
+            }
+            else
+            {
+                <a href="@Url.Action("Login", "Account")" class="button-2">Log in</a>
+                <a href="@Url.Action("SignUp", "Account")" class="button-2">Sign Up</a>
+            }
+        </div>
+        <div class="mobile-menu-overlay"></div>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Mobile menu functionality
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const header = document.querySelector('.header');
+        const overlay = document.querySelector('.mobile-menu-overlay');
+
+        function toggleMobileMenu() {
+            header.classList.toggle('mobile-menu-active');
+            document.body.style.overflow = header.classList.contains('mobile-menu-active') ? 'hidden' : '';
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        overlay.addEventListener('click', toggleMobileMenu);
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.nav-link, .button-2').forEach(link => {
+            link.addEventListener('click', () => {
+                if (header.classList.contains('mobile-menu-active')) {
+                    toggleMobileMenu();
+                }
+            });
+        });
+
+        // Recommendations link functionality
+        document.getElementById('recommendations-link').addEventListener('click', function () {
+            @if (Context.Session.GetInt32("UserId") != null)
+                {
+                    <text>window.location.href = '@Url.Action("Recommendations", "Home")';</text>
+            }
+                else
+                {
+                    <text>window.location.href = '@Url.Action("Login", "Account")';</text>
+            }
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

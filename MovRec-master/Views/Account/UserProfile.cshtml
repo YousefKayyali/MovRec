@@ -1,0 +1,227 @@
+@model MovRec.Models.User
+@{
+    ViewData["Title"] = "User Profile";
+}
+
+<link rel="stylesheet" href="~/css/userProfile.css">
+
+<div class="profile-container">
+    <div class="profile-header">
+        <h1>@Model.username</h1>
+        <p>@@username</p>
+    </div>
+
+    <form id="profileForm" asp-action="UpdateProfile" asp-controller="Account" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="user_id" />
+        <input type="hidden" asp-for="password" />
+        <input type="hidden" asp-for="create_date" />
+        <input type="hidden" asp-for="is_active" />
+        <input type="hidden" asp-for="gener" />
+
+        <div class="section-title">Account Details</div>
+
+        <div class="form-group">
+            <label asp-for="email">Email</label>
+            <div class="input-group">
+                <input type="email" class="form-control" asp-for="email" disabled autocomplete="off">
+                <div class="input-group-append">
+                    <button type="button" class="edit-btn" data-field="email">Edit</button>
+                    <button type="button" class="save-btn" data-field="email" style="display: none;">Save</button>
+                    <button type="button" class="cancel-btn" data-field="email" style="display: none;">Cancel</button>
+                </div>
+            </div>
+            <span asp-validation-for="email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="username">Username</label>
+            <div class="input-group">
+                <input type="text" class="form-control" asp-for="username" disabled autocomplete="off">
+                <div class="input-group-append">
+                    <button type="button" class="edit-btn" data-field="username">Edit</button>
+                    <button type="button" class="save-btn" data-field="username" style="display: none;">Save</button>
+                    <button type="button" class="cancel-btn" data-field="username"
+                        style="display: none;">Cancel</button>
+                </div>
+            </div>
+            <span asp-validation-for="username" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <button type="button" class="change-password-btn"
+                onclick="window.location.href='@Url.Action("ChangePassword", "Account")'">Change Password</button>
+        </div>
+
+        <div class="section-title">Personal Information</div>
+
+        <div class="form-group">
+            <label asp-for="birth_date">Birthday</label>
+            <div class="input-group">
+                <input type="date" class="form-control" asp-for="birth_date" disabled autocomplete="off">
+                <div class="input-group-append">
+                    <button type="button" class="edit-btn" data-field="birth_date">Edit</button>
+                    <button type="button" class="save-btn" data-field="birth_date" style="display: none;">Save</button>
+                    <button type="button" class="cancel-btn" data-field="birth_date"
+                        style="display: none;">Cancel</button>
+                </div>
+            </div>
+            <span asp-validation-for="birth_date" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Age</label>
+            <input type="text" class="form-control" value="@((DateTime.Now.Year - Model.birth_date.Year))" disabled
+                autocomplete="off">
+        </div>
+
+        <div class="section-title">Favorite Genres</div>
+        <div class="form-group">
+            @if (string.IsNullOrEmpty(Model.gener))
+            {
+                <div class="no-genres-message">
+                    <p>You haven't selected any genres yet.</p>
+                    <a href="@Url.Action("Index", "Categories")" class="select-genres-btn">Select Genres</a>
+                </div>
+            }
+            else
+            {
+                <div class="genres-container">
+                    @foreach (var genre in Model.gener.Split(','))
+                    {
+                        <span class="genre-tag">
+                            @{
+                                var formattedGenre = genre;
+                                if (genre == "ScienceFiction")
+                                {
+                                    formattedGenre = "Science Fiction";
+                                }
+                                else if (genre == "TVMovie")
+                                {
+                                    formattedGenre = "TV Movie";
+                                }
+                                @formattedGenre
+                            }
+                        </span>
+                    }
+                </div>
+            }
+            <button type="button" class="edit-genres-btn"
+                onclick="window.location.href='@Url.Action("Index", "Categories")'">Edit Genres</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let originalValues = {};
+
+            // Function to clear error message for a specific field
+            function clearError(field) {
+                const errorSpan = document.querySelector(`span[data-valmsg-for="${field}"]`);
+                if (errorSpan) {
+                    errorSpan.textContent = '';
+                }
+            }
+
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const field = this.dataset.field;
+                    const input = document.querySelector(`[name="${field}"]`);
+                    const saveBtn = document.querySelector(`.save-btn[data-field="${field}"]`);
+                    const cancelBtn = document.querySelector(`.cancel-btn[data-field="${field}"]`);
+                    const editBtn = this;
+
+                    // Clear any existing error message
+                    clearError(field);
+
+                    // Store original value
+                    originalValues[field] = input.value;
+
+                    // Enable input and show save/cancel buttons
+                    input.disabled = false;
+                    input.focus();
+                    saveBtn.style.display = 'inline-block';
+                    cancelBtn.style.display = 'inline-block';
+                    editBtn.style.display = 'none';
+                });
+            });
+
+            document.querySelectorAll('.cancel-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const field = this.dataset.field;
+                    const input = document.querySelector(`[name="${field}"]`);
+                    const saveBtn = document.querySelector(`.save-btn[data-field="${field}"]`);
+                    const cancelBtn = this;
+                    const editBtn = document.querySelector(`.edit-btn[data-field="${field}"]`);
+
+                    // Clear any existing error message
+                    clearError(field);
+
+                    // Restore original value
+                    if (originalValues[field] !== undefined) {
+                        input.value = originalValues[field];
+                    }
+
+                    // Disable input and hide save/cancel buttons
+                    input.disabled = true;
+                    saveBtn.style.display = 'none';
+                    cancelBtn.style.display = 'none';
+                    editBtn.style.display = 'inline-block';
+                });
+            });
+
+            document.querySelectorAll('.save-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const field = this.dataset.field;
+                    const input = document.querySelector(`[name="${field}"]`);
+                    const formData = new FormData();
+
+                    // Clear any existing error message before saving
+                    clearError(field);
+
+                    // Add only the field being edited
+                    formData.append(field, input.value);
+                    formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+                    fetch('/Account/UpdateProfile', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update the UI
+                                input.disabled = true;
+                                this.style.display = 'none';
+                                document.querySelector(`.cancel-btn[data-field="${field}"]`).style.display = 'none';
+                                document.querySelector(`.edit-btn[data-field="${field}"]`).style.display = 'inline-block';
+
+                                // If username was changed, update the header
+                                if (field === 'username') {
+                                    document.querySelector('.profile-header h1').textContent = input.value;
+                                }
+                            } else {
+                                // Show validation errors
+                                if (data.errors) {
+                                    Object.keys(data.errors).forEach(key => {
+                                        const errorSpan = document.querySelector(`span[data-valmsg-for="${key}"]`);
+                                        if (errorSpan) {
+                                            errorSpan.textContent = data.errors[key];
+                                        }
+                                    });
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            alert('An error occurred while saving your changes.');
+                        });
+                });
+            });
+        });
+    </script>
+}

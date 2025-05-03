@@ -1,0 +1,123 @@
+@model IEnumerable<MovRec.Models.MovieWithRating>
+@{
+    ViewData["Title"] = "My Ratings";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Ratings</title>
+    <link rel="stylesheet" href="~/css/homepage.css">
+    <link rel="stylesheet" href="~/css/search.css">
+    <link rel="stylesheet" href="~/css/watchlist.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-newsletter">
+            <div class="text-content-title">
+                <span class="text-wrapper-2">My Ratings</span>
+            </div>
+        </section>
+
+        <!-- Movie Grid -->
+        <section class="movies-section">
+            <div class="watchlist-header">
+                @if (Model.Any())
+                {
+                    <span>Found @Model.Count() rated movies</span>
+                }
+            </div>
+            @if (Model.Any())
+            {
+                <div class="movies-grid">
+                    @foreach (var item in Model)
+                    {
+                        <div class="movie-item">
+                            <a href="@Url.Action("Details", "Movies", new { id = item.Movie.movie_id })">
+                                <img src="~/images/posters/@(item.Movie.movie_id)_poster.jpg" alt="@item.Movie.title"
+                                    class="movie-poster">
+                                <div class="movie-info">
+                                    <div class="movie-title">@item.Movie.title</div>
+                                    <div class="movie-rating">
+                                        <div class="rating-stars">
+                                            @{
+                                                var rating = item.Rating;
+                                                var fullStars = (int)rating;
+                                                var hasHalfStar = rating - fullStars >= 0.5;
+                                            }
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= fullStars)
+                                                {
+                                                    <i class="fas fa-star"></i>
+                                                }
+                                                else if (i == fullStars + 1 && hasHalfStar)
+                                                {
+                                                    <i class="fas fa-star-half-alt"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-star"></i>
+                                                }
+                                            }
+                                        </div>
+                                        <span class="rating-value">@item.Rating.ToString("F1")/5</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-watchlist">
+                    <i class="fas fa-star"></i>
+                    <p>You haven't rated any movies yet</p>
+                    <a href="@Url.Action("UserHome", "Home")" class="browse-btn">Browse Movies</a>
+                </div>
+            }
+        </section>
+    </div>
+
+    <script src="~/js/search.js"></script>
+</body>
+
+</html>
+
+<style>
+    .movie-info {
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.8);
+    }
+
+    .movie-rating {
+        margin-top: 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .rating-stars {
+        color: #FFD700;
+        font-size: 12px;
+    }
+
+    .rating-value {
+        color: #FFD700;
+        font-weight: bold;
+    }
+
+    .empty-watchlist .fas.fa-star {
+        font-size: 48px;
+        margin-bottom: 20px;
+        color: #FFD700;
+    }
+</style>

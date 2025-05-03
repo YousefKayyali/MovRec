@@ -1,0 +1,384 @@
+@model MovRec.Models.ViewModels.MovieDetailsViewModel
+@{
+    ViewData["Title"] = Model.Movie.title;
+    var isLoggedIn = Context.Session.GetInt32("UserId") != null;
+    var isInWatchlist = ViewBag.IsInWatchlist ?? false;
+    // Debug information
+    var userId = Context.Session.GetInt32("UserId");
+    var sessionId = Context.Session.Id;
+}
+
+<!-- Debug information (will be removed later) -->
+
+
+<link rel="stylesheet" href="~/css/movieDetails.css">
+<link rel="stylesheet" href="~/css/sliderscss.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="movie-banner" style="--backdrop-url: url('/images/backdrops/@(Model.Movie.movie_id)_backdrop.jpg');">
+    <div class="movie-info">
+        <img id="movie-poster" src="~/images/posters/@(Model.Movie.movie_id)_poster.jpg" alt="@Model.Movie.title">
+        <div class="movie-text">
+            <h1>@Model.Movie.title</h1>
+            <h2>@Model.Movie.release_date.Year</h2>
+            <h3>Duration: @Model.Movie.runtime minutes</h3>
+            @if (isLoggedIn)
+            {
+                <form id="watchlistForm" asp-action="AddToWatchlist" asp-controller="Movies" method="post">
+                    <input type="hidden" name="movieId" value="@Model.Movie.movie_id" />
+                    <button type="submit" class="watchlist-btn @(isInWatchlist ? "added" : "")">
+                        <i class="fas @(isInWatchlist ? "fa-check" : "fa-plus")"></i>
+                        <span>@(isInWatchlist ? "Remove from Watch List" : "Add to Watch List")</span>
+                    </button>
+                </form>
+            }
+            else
+            {
+                <button class="watchlist-btn disabled" disabled>
+                    <i class="fas fa-plus"></i> Add to Watch List
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="left">
+        <h3>Description</h3>
+        <p>@Model.Movie.over_review</p>
+
+        <h3>Production Companies</h3>
+        <div class="tags">
+            @if (!string.IsNullOrEmpty(Model.Movie.production_companies))
+            {
+                foreach (var company in Model.Movie.production_companies.Split(','))
+                {
+                    <span class="tag">@company.Trim()</span>
+                }
+            }
+        </div>
+        <h3>Countries</h3>
+        <div class="tags">
+            @if (!string.IsNullOrEmpty(Model.Movie.production_countries))
+            {
+                foreach (var country in Model.Movie.production_countries.Split(','))
+                {
+                    <span class="tag">@country.Trim()</span>
+                }
+            }
+        </div>
+
+        <h3>Genres</h3>
+        <div class="tags">
+            @if (Model.Genres != null && Model.Genres.Any())
+            {
+                foreach (var genre in Model.Genres)
+                {
+                    <a href="@Url.Action("AdvancedSearch", "Movies", new { genres = new[] { genre } })" class="tag genre-tag">
+                        @genre
+                    </a>
+                }
+            }
+        </div>
+    </div>
+    <div class="right">
+        <h3>Director</h3>
+        <ul>
+            <li>@Model.Movie.director</li>
+        </ul>
+        <h3>Stars</h3>
+        <ul>
+            @if (!string.IsNullOrEmpty(Model.Movie.casts))
+            {
+                foreach (var actor in Model.Movie.casts.Split(','))
+                {
+                    <li>@actor.Trim()</li>
+                }
+            }
+        </ul>
+
+        <div class="ratings-container">
+            <div class="rating-item">
+                <h3>Rating</h3>
+                <div class="rating-value">@Model.Movie.avg_rate/5</div>
+            </div>
+            <div class="rating-item">
+                <h3>Public Rating</h3>
+                <div class="rating-value">@($"{Model.Movie.public_rating:F2}")/5</div>
+            </div>
+        </div>
+
+        @if (isLoggedIn)
+        {
+            <h3>Your Rating</h3>
+            <div class="container pt-5 mt-5">
+                <div class="row py-2 bg-light border">
+                    <div class="col-2 ml-auto">
+                        <div id="starrate" class="starrate mt-3" data-val="@(ViewBag.UserRating ?? 0)" data-max="5">
+                            <span class="ctrl"></span>
+                            <span class="cont m-1">
+                                <i class="far fa-fw fa-star"></i>
+                                <i class="far fa-fw fa-star"></i>
+                                <i class="far fa-fw fa-star"></i>
+                                <i class="far fa-fw fa-star"></i>
+                                <i class="far fa-fw fa-star"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="test" class="col-3 mr-auto display-4">@(ViewBag.UserRating?.ToString("F1") ?? "0.0")</div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col">
+                        <button class="rate-btn" onclick="submitRating()">Rate</button>
+                        <button class="remove-btn" onclick="removeRating()">Remove</button>
+                    </div>
+                </div>
+                <form id="ratingForm" asp-action="RateMovie" asp-controller="Movies" method="post">
+                    <input type="hidden" name="movieId" value="@Model.Movie.movie_id" />
+                    <input type="hidden" name="rating" id="ratingValue" value="@ViewBag.UserRating" />
+                </form>
+            </div>
+        }
+        else
+        {
+            <a href="@Url.Action("Login", "Account")" class="login-btn">Log in to rate this movie</a>
+        }
+    </div>
+
+</div>
+<div class="main-carousels" id="recommended-movies">
+    <div class="carousel-title">
+        <span class="text">Similar Movies</span>
+    </div>
+    <div class="container-slider">
+        <span class="btn-sim" onclick="prevSimilarSlide()">❮</span>
+        <div class="carousel-container">
+            <div class="carousel">
+                @foreach (var similarMovie in Model.SimilarMoviesWithScores)
+                {
+                    <div class="poster-container">
+                        <div class="poster">
+                            <a href="@Url.Action("Details", "Movies", new { id = similarMovie.Movie.movie_id })"
+                                class="debug">
+                                <img src="~/images/posters/@(similarMovie.Movie.movie_id)_poster.jpg"
+                                    alt="@similarMovie.Movie.title" class="poster" loading="lazy">
+                            </a>
+                            <div class="title">@similarMovie.Movie.title</div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+        <span class="btn-sim" onclick="nextSimilarSlide()">❯</span>
+    </div>
+</div>
+</div>
+
+<div class="footer">
+    <button onclick="window.history.back()">Go Back</button>
+</div>
+
+<style>
+    .star-rating.readonly .stars {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    .login-message {
+        color: #888;
+        font-style: italic;
+        margin-top: 10px;
+        font-size: 0.9em;
+    }
+
+    .ratings-container {
+        display: flex;
+        gap: 20px;
+        margin: 10px 0;
+    }
+
+    .rating-item {
+        flex: 1;
+    }
+
+    .rating-item h3 {
+        margin-bottom: 5px;
+    }
+
+    .rating-value {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .genre-tag {
+        display: inline-block;
+        background: #ff0000;
+        color: #fff;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 5px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        margin: 4px;
+    }
+
+    .genre-tag:hover {
+        background: #e00000;
+        transform: translateY(-5px);
+    }
+</style>
+
+@section Scripts {
+    <script src="~/js/similarMoviesCarousel.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var valueHover = 0;
+        function calcSliderPos(e, maxV) {
+            return (e.offsetX / e.target.clientWidth) * parseInt(maxV, 10);
+        }
+
+        $(".starrate").on("click", function () {
+            $(this).data('val', valueHover);
+            $(this).addClass('saved')
+        });
+
+        $(".starrate").on("mouseout", function () {
+            upStars($(this).data('val'));
+        });
+
+        $(".starrate span.ctrl").on("mousemove", function (e) {
+            var maxV = parseInt($(this).parent("div").data('max'))
+            valueHover = Math.ceil(calcSliderPos(e, maxV) * 2) / 2;
+            upStars(valueHover);
+        });
+
+        function upStars(val) {
+            var val = parseFloat(val);
+            $("#test").html(val.toFixed(1));
+
+            var full = Number.isInteger(val);
+            val = parseInt(val);
+            var stars = $("#starrate i");
+
+            // Set all stars to empty first
+            stars.attr("class", "far fa-fw fa-star");
+
+            // Fill stars up to the integer part
+            stars.slice(0, val).attr("class", "fas fa-fw fa-star");
+
+            // Add half star if needed
+            if (!full) {
+                stars.slice(val, val + 1).attr("class", "fas fa-fw fa-star-half-alt");
+            }
+
+            // Update the color based on the rating
+            if (val > 0) {
+                $("#starrate").css("color", "#FFD700"); // Gold color for rated stars
+            } else {
+                $("#starrate").css("color", "#FFD700"); // Keep gold color for unrated
+            }
+        }
+
+        $(document).ready(function () {
+            $(".starrate span.ctrl").width($(".starrate span.cont").width());
+            $(".starrate span.ctrl").height($(".starrate span.cont").height());
+
+            // Initialize stars with user's rating if it exists
+            if (@Json.Serialize(isLoggedIn)) {
+                var initialRating = parseFloat($("#starrate").data('val'));
+                if (initialRating > 0) {
+                    upStars(initialRating);
+                    $("#starrate").addClass('saved');
+                } else {
+                    upStars(0); // Initialize with empty stars
+                }
+            }
+        });
+
+        // Handle rating submission
+        window.submitRating = function () {
+            if (!@Json.Serialize(isLoggedIn)) return;
+
+            const rating = parseFloat($("#test").text());
+            if (rating === 0) return;
+
+            $("#ratingValue").val(rating);
+
+            $.ajax({
+                url: $('#ratingForm').attr('action'),
+                type: 'POST',
+                data: {
+                    movieId: @Model.Movie.movie_id,
+                    rating: rating
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $("#starrate").addClass('saved');
+                        upStars(rating); // Update stars after successful submission
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error submitting rating:', error);
+                }
+            });
+        };
+
+        // Handle rating removal
+        window.removeRating = function () {
+            if (!@Json.Serialize(isLoggedIn)) return;
+
+            $.ajax({
+                url: $('#ratingForm').attr('action'),
+                type: 'POST',
+                data: {
+                    movieId: @Model.Movie.movie_id,
+                    rating: 0
+                },
+                success: function (response) {
+                    if (response.success) {
+                        valueHover = 0;
+                        upStars(0);
+                        $("#starrate").removeClass('saved');
+                        $("#ratingValue").val(0);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error removing rating:', error);
+                }
+            });
+        };
+
+        // Watchlist form handling
+        $('#watchlistForm').on('submit', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var button = form.find('button');
+            var icon = button.find('i');
+            var text = button.find('span');
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        if (response.action === 'add') {
+                            button.addClass('added');
+                            icon.removeClass('fa-plus').addClass('fa-check');
+                            text.text('Remove from Watch List');
+                        } else {
+                            button.removeClass('added');
+                            icon.removeClass('fa-check').addClass('fa-plus');
+                            text.text('Add to Watch List');
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

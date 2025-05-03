@@ -1,0 +1,43 @@
+@model MovRec.Models.ViewModels.CategoriesViewModel
+@{
+    ViewData["Title"] = "Select Categories";
+    Layout = "_LayoutNoHeader";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/categories.css">
+</head>
+
+<body>
+    <div class="categories-container">
+        <h1>Select Your Favorite Categories</h1>
+        <p class="subtitle">Choose the categories that interest you</p>
+
+        <form asp-action="SaveCategories" method="post" id="categoriesForm">
+            <div class="categories-grid">
+                @foreach (var category in Model.AvailableCategories)
+                {
+                    <div class="category-item">
+                        <input type="checkbox" name="SelectedCategories" value="@category" id="@category"
+                            @(Model.SelectedCategories.Contains(category) ? "checked" : "") />
+                        <label for="@category">@category</label>
+                    </div>
+                }
+            </div>
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <button type="submit" class="button-3">Continue</button>
+        </form>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+
+</html>
