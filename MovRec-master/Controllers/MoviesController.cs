@@ -75,7 +75,7 @@ namespace MovRec.Controllers
                     Movie = sm.SimilarMovieNavigation,
                     Score = sm.score
                 })
-                .Take(15)
+                .Take(30)
                 .ToListAsync();
 
             // Check if movie is in user's watchlist and get user's rating
