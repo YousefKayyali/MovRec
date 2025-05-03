@@ -1,7 +1,0 @@
-wwwroot/images/*
-bin/
-obj/
-.vs/
-*.user
-*.suo
-*.cache
