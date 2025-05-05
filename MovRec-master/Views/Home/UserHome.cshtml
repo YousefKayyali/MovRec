@@ -61,9 +61,36 @@
                     </div>
                 </div>
             </div>
-
+            <div class="main-carousels">
+                <div class="carousel-title">
+                    <span class="text">Latest Releases </span>
+                </div>
+                <div class="container-slider">
+                    <div class="btn-container">
+                        <span class="btn" onclick="prevSlide(1)">❮</span>
+                    </div>
+                    <div class="carousel-container">
+                        <div class="carousel">
+                            @foreach (var movie in Model.LatestReleases)
+                            {
+                                <div class="poster-container">
+                                    <div class="poster">
+                                        <a href="@Url.Action("Details", "Movies", new { id = movie.movie_id })"
+                                            class="debug"><img src="~/images/posters/@(movie.movie_id)_poster.jpg"
+                                                alt="@movie.title" class="poster" loading="lazy"></a>
+                                        <div class="title">@movie.title</div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="btn-container">
+                        <span class="btn" onclick="nextSlide(1)">❯</span>
+                    </div>
+                </div>
+            </div>
             @{
-                var carouselIndex = 1;
+                var carouselIndex = 2;
             }
 
             @foreach (var genre in Model.UserGenres.Take(3))
