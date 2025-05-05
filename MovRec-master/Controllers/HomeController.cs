@@ -136,11 +136,19 @@ public class HomeController : Controller
             genreMovies[displayGenre] = moviesInGenre;
         }
 
+        // Get latest releases (2022-2023)
+        var latestReleases = await _context.Movies
+            .Where(m => m.release_date.Year >= 2022)
+            .OrderByDescending(m => m.avg_rate)
+            .Take(35)
+            .ToListAsync();
+
         var model = new HomeViewModel
         {
             RecoMovies = recommendedMovies,
             GenreMovies = genreMovies,
-            UserGenres = userGenres
+            UserGenres = userGenres,
+            LatestReleases = latestReleases
         };
 
         return View(model);
