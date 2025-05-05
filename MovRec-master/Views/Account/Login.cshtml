@@ -18,35 +18,39 @@
 <body>
     <div class="loginContainer">
         <div class="overlow"></div>
-            <div class="login-container">
-                <h1>Login</h1>
-                <form id="loginForm" asp-action="Login" method="post">
-                    <input asp-for="username" type="text" id="username" class="input-field" placeholder="Username" required
-                           autocomplete="off" />
-                    <span asp-validation-for="username" class="text-danger"></span>
-                    <input asp-for="password" type="password" id="password" class="input-field" placeholder="Password" required
-                           autocomplete="off" />
-                    <span asp-validation-for="password" class="text-danger"></span>
-                    <button type="submit" class="login-btn">Login</button>
-                </form>
+        <div class="login-container">
+            <h1>Login</h1>
+            <form id="loginForm" asp-action="Login" method="post">
+                @if (!string.IsNullOrEmpty(ViewData["ReturnUrl"]?.ToString()))
+                {
+                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+                }
+                <input asp-for="username" type="text" id="username" class="input-field" placeholder="Username" required
+                    autocomplete="off" />
+                <span asp-validation-for="username" class="text-danger"></span>
+                <input asp-for="password" type="password" id="password" class="input-field" placeholder="Password"
+                    required autocomplete="off" />
+                <span asp-validation-for="password" class="text-danger"></span>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
 
-                <div class="error-message" id="error-message">
-                    @if (!ViewData.ModelState.IsValid)
-                    {
-                        <div class="text-danger">
-                            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
-                        </div>
-                    }
-                </div>
+            <div class="error-message" id="error-message">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="text-danger">
+                        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                    </div>
+                }
+            </div>
 
-                <div class="forgot-password">
-                    <a href="@Url.Action("ForgotPassword", "Account")">Forgot password?</a>
-                </div>
-                <div class="forgot-password">
-                    <a href="@Url.Action("SignUp", "Account")">Don't have an Account?</a>
-                </div>
+            <div class="forgot-password">
+                <a href="@Url.Action("ForgotPassword", "Account")">Forgot password?</a>
+            </div>
+            <div class="forgot-password">
+                <a href="@Url.Action("SignUp", "Account")">Don't have an Account?</a>
             </div>
         </div>
+    </div>
     </div>
 </body>
 
