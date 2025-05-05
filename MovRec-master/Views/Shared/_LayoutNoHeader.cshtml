@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - MovRec</title>
+    <link rel="icon" type="image/jpeg" href="~/images/logo.jpeg" />
     <link rel="stylesheet" href="~/css/site.css" />
     @RenderSection("Styles", required: false)
 </head>
+
 <body>
     <div class="container">
         <main role="main" class="pb-3">
@@ -16,4 +19,5 @@
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>
