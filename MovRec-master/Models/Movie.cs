@@ -17,7 +17,6 @@ public class Movie
     public string? director { get; set; }
     public string? production_companies { get; set; }
     public string? production_countries { get; set; }
-    public string? movie_homepage { get; set; }
     public double? avg_rate { get; set; }
     public double? public_rating { get; set; }
 }

@@ -41,7 +41,7 @@ class Model(torch.nn.Module):
         pd_cmp_vec=pd_cmp.mean(dim=0)
         pd_count_vec=pd_count.mean(dim=0)
         movie=torch.cat((tit,ovrv_vec,dire,ct_vec,gn_vec,pd_cmp_vec,pd_count_vec,num_data),dim=-1)
-        return torch.tensor(movie,device=device,dtype=torch.float32)
+        return movie.clone().detach().requires_grad_(True)
 model=Model()
 path=r"D:\movrec\MovRec-master\AiModel\base_model.pth"
 model.load_state_dict(torch.load(path))
