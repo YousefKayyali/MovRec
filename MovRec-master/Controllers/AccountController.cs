@@ -233,6 +233,10 @@ public class AccountController : Controller
                     HttpContext.Session.SetInt32("UserId", user.user_id);
                     HttpContext.Session.SetString("Username", user.username);
 
+                    if (!string.IsNullOrEmpty(returnUrl))
+                    {
+                        return Redirect(returnUrl);
+                    }
                     return RedirectToAction("UserHome", "Home");
                 }
             }
